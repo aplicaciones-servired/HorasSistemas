@@ -70,7 +70,7 @@ export const RegistroForm = ({
               onChange={(event) => onChange('nombres', event.target.value)}
               placeholder="Juan Carlos"
             />
-          </label>
+          </label>Ñ
         </div>
 
         <div className="form-grid form-grid--three">
@@ -119,6 +119,21 @@ export const RegistroForm = ({
             />
           </label>
         </div>
+
+        <label className="switch-row">
+          <span className="switch-row__control">
+            <input
+              id={`dominical-${values.fecha}`}
+              className="switch-row__input"
+              type="checkbox"
+              checked={values.esDominical}
+              onChange={(event) => onChange('esDominical', event.target.checked)}
+              aria-checked={values.esDominical}
+            />
+            <span className="switch-row__slider" aria-hidden="true" />
+          </span>
+          <span>Es dominical o festivo</span>
+        </label>
 
         <label>
           Observación

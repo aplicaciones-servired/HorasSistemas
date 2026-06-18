@@ -30,7 +30,8 @@ const initialRegistroForm: RegistroFormValues = {
   fecha: today,
   horaEntrada: '',
   horaSalida: '',
-  observacion: ''
+  observacion: '',
+  esDominical: false
 };
 
 const initialCargoForm: CargoFormValues = {
@@ -219,7 +220,8 @@ export const useDashboard = () => {
     fecha: values.fecha,
     horaEntrada: values.horaEntrada,
     horaSalida: values.horaSalida,
-    observacion: values.observacion.trim() ? values.observacion.trim() : null
+    observacion: values.observacion.trim() ? values.observacion.trim() : null,
+    esDominical: values.esDominical
   });
 
   const handleGuardarRegistro = async (event: FormEvent<HTMLFormElement>): Promise<void> => {

@@ -8,6 +8,7 @@ export interface RegistroPayload {
   horaEntrada: string;
   horaSalida: string;
   observacion: string | null;
+  esDominical: boolean;
 }
 
 export const listRegistros = async (): Promise<RegistroAsistencia[]> => {

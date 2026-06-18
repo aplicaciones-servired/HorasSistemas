@@ -11,11 +11,12 @@ export interface RegistroAsistenciaAttributes {
   horaEntrada: string;
   horaSalida: string;
   observacion: string | null;
+  esDominical: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export type RegistroAsistenciaCreationAttributes = Optional<RegistroAsistenciaAttributes, 'id' | 'cargoId' | 'observacion'>;
+export type RegistroAsistenciaCreationAttributes = Optional<RegistroAsistenciaAttributes, 'id' | 'cargoId' | 'observacion' | 'esDominical'>;
 
 export class RegistroAsistencia extends Model<RegistroAsistenciaAttributes, RegistroAsistenciaCreationAttributes> implements RegistroAsistenciaAttributes {
   declare id: number;
@@ -25,6 +26,7 @@ export class RegistroAsistencia extends Model<RegistroAsistenciaAttributes, Regi
   declare horaEntrada: string;
   declare horaSalida: string;
   declare observacion: string | null;
+  declare esDominical: boolean;
   declare createdAt: Date;
   declare updatedAt: Date;
 }
@@ -67,6 +69,11 @@ RegistroAsistencia.init(
     observacion: {
       type: DataTypes.STRING(255),
       allowNull: true
+    },
+    esDominical: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   },
   {
