@@ -64,6 +64,11 @@ export const RegistroForm = ({
             <input
               value={values.cedula}
               onChange={(event) => onChange('cedula', event.target.value)}
+              onBlur={() => {
+                if (!personaEncontrada && values.cedula.trim()) {
+                  onBuscarCedula();
+                }
+              }}
               placeholder="10203040"
             />
           </label>
@@ -107,6 +112,41 @@ export const RegistroForm = ({
               {lookupState === 'idle' && 'Pendiente'}
             </strong>
           </div>
+        </div>
+
+        <div className="quick-shifts">
+          <span className="quick-shifts__label">Turnos rápidos</span>
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() => {
+              onChange('horaEntrada', '14:30');
+              onChange('horaSalida', '21:30');
+            }}
+          >
+            2:30 PM – 9:30 PM
+          </button>
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() => {
+              onChange('horaEntrada', '06:30');
+              onChange('horaSalida', '13:30');
+            }}
+          >
+            6:30 AM – 1:30 PM
+          </button>
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() => {
+              onChange('horaEntrada', '08:00');
+              onChange('horaSalida', '19:00');
+              onChange('esDominical', true);
+            }}
+          >
+            Festivo/Dominical 8 AM – 7 PM
+          </button>
         </div>
 
         <div className="form-grid form-grid--two">

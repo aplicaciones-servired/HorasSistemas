@@ -391,6 +391,23 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.quick-shifts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.quick-shifts__label {
+  font-size: 0.95rem;
+  color: var(--text-h);
+}
+
+.quick-shifts .ghost-button {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.85rem;
+}
+
 label {
   display: grid;
   gap: 8px;
