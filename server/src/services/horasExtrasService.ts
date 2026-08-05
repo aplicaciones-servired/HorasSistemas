@@ -339,6 +339,11 @@ export class HorasExtrasService {
       worksheet.getCell(ref).font = fuenteTitulo;
       worksheet.getCell(ref).alignment = { ...align, vertical: 'top', wrapText: true };
     }
+    // RECARGO NOCTURNO: ORDINARIO y FESTIVO en Calibri 5, centrados vertical y horizontalmente
+    worksheet.getCell('H8').font = { bold: true, size: 5, name: 'Calibri' };
+    worksheet.getCell('H8').alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    worksheet.getCell('I8').font = { bold: true, size: 5, name: 'Calibri' };
+    worksheet.getCell('I8').alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
 
     // Datos
     filas.forEach((fila, idx) => {
@@ -374,10 +379,10 @@ export class HorasExtrasService {
       worksheet.getCell(filaNumero, 3).alignment = { horizontal: 'center', vertical: 'top', wrapText: true, shrinkToFit: true };
       worksheet.getCell(filaNumero, 5).numFmt = 'd/mm/yyyy;@';
       worksheet.getCell(filaNumero, 5).alignment = { horizontal: 'center', vertical: 'top', wrapText: true, shrinkToFit: true };
-      worksheet.getCell(filaNumero, 8).font = { size: 10, name: 'Times New Roman' };
-      worksheet.getCell(filaNumero, 8).alignment = { horizontal: 'left', wrapText: true };
-      worksheet.getCell(filaNumero, 9).font = { size: 10, name: 'Times New Roman' };
-      worksheet.getCell(filaNumero, 9).alignment = { horizontal: 'left', wrapText: true };
+      worksheet.getCell(filaNumero, 8).font = { size: 5, name: 'Calibri' };
+      worksheet.getCell(filaNumero, 8).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+      worksheet.getCell(filaNumero, 9).font = { size: 5, name: 'Calibri' };
+      worksheet.getCell(filaNumero, 9).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
       worksheet.getCell(filaNumero, 15).numFmt = '0';
       worksheet.getCell(filaNumero, 15).alignment = { horizontal: 'center', vertical: 'top', wrapText: true, shrinkToFit: true };
     });
