@@ -1,6 +1,7 @@
 import { DashboardHeader } from '../components/layout/DashboardHeader';
 import { PersonaForm } from '../components/forms/PersonaForm';
 import { PersonasTable } from '../components/tables/PersonasTable';
+import { StatusToaster } from '../components/toast/StatusToaster';
 import { useDashboard } from '../hooks/useDashboard';
 
 export const UsuariosPage = () => {
@@ -17,11 +18,7 @@ export const UsuariosPage = () => {
         ]}
       />
 
-      {dashboard.status.type !== 'idle' ? (
-        <section className={`status-banner status-banner--${dashboard.status.type}`} aria-live="polite">
-          {dashboard.status.message}
-        </section>
-      ) : null}
+      <StatusToaster status={dashboard.status} />
 
       <section className="workspace-grid workspace-grid--single">
         <PersonaForm

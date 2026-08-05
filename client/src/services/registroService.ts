@@ -25,3 +25,7 @@ export const updateRegistro = async (id: number, payload: RegistroPayload): Prom
   const response = await api.put<RegistroAsistencia>(`/registros/${id}`, payload);
   return response.data;
 };
+
+export const deleteRegistro = async (id: number): Promise<void> => {
+  await api.delete(`/registros/${id}`);
+};

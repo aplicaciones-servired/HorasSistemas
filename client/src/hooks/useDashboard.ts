@@ -8,7 +8,7 @@ import {
   updatePersona,
   type PersonaPayload
 } from '../services/personaService';
-import { createRegistro, listRegistros, updateRegistro, type RegistroPayload } from '../services/registroService';
+import { createRegistro, deleteRegistro, listRegistros, updateRegistro, type RegistroPayload } from '../services/registroService';
 import type {
   Cargo,
   CargoFormValues,
@@ -55,11 +55,13 @@ export const useDashboard = () => {
   const [cargoForm, setCargoForm] = useState<CargoFormValues>(initialCargoForm);
   const [personaForm, setPersonaForm] = useState<PersonaFormValues>(initialPersonaForm);
   const [editingPersonaId, setEditingPersonaId] = useState<number | null>(null);
+  const [editingRegistroId, setEditingRegistroId] = useState<number | null>(null);
   const [status, setStatus] = useState<{ type: StatusType; message: string }>({ type: 'idle', message: '' });
   const [lookupState, setLookupState] = useState<LookupState>('idle');
   const [foundPersona, setFoundPersona] = useState<Persona | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingRegistro, setIsSavingRegistro] = useState(false);
+  const [isDeletingRegistro, setIsDeletingRegistro] = useState(false);
   const [isSavingCargo, setIsSavingCargo] = useState(false);
   const [isSavingPersona, setIsSavingPersona] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
@@ -175,6 +177,32 @@ export const useDashboard = () => {
     setPersonaForm(initialPersonaForm);
   };
 
+  const loadRegistroForEdit = (registro: RegistroAsistencia): void => {
+    const persona = registro.persona ?? null;
+    setEditingRegistroId(registro.id);
+    setFoundPersona(persona);
+    setLookupState(persona ? 'found' : 'idle');
+    setRegistroForm({
+      cedula: persona?.cedula ?? '',
+      nombres: persona?.nombres ?? '',
+      apellidos: persona?.apellidos ?? '',
+      cargoId: registro.cargoId ? String(registro.cargoId) : '',
+      fecha: registro.fecha,
+      horaEntrada: registro.horaEntrada,
+      horaSalida: registro.horaSalida,
+      observacion: registro.observacion ?? '',
+      esDominical: registro.esDominical
+    });
+    setStatus({ type: 'info', message: 'Registro cargado para edición.' });
+  };
+
+  const resetRegistroForm = (): void => {
+    setEditingRegistroId(null);
+    setFoundPersona(null);
+    setLookupState('idle');
+    setRegistroForm(initialRegistroForm);
+  };
+
   const handleBuscarCedula = async (): Promise<void> => {
     const cedula = registroForm.cedula.trim();
 
@@ -248,35 +276,63 @@ export const useDashboard = () => {
       }
 
       const registroPayload = buildRegistroPayload(persona.id, registroForm);
-      const existingRegistro = registros.find(
-        (registro) => registro.personaId === persona.id && registro.fecha === registroForm.fecha
-      );
 
-      if (existingRegistro) {
-        await updateRegistro(existingRegistro.id, registroPayload);
+      if (editingRegistroId) {
+        await updateRegistro(editingRegistroId, registroPayload);
+        setStatus({ type: 'success', message: 'Registro actualizado correctamente.' });
+        resetRegistroForm();
       } else {
-        await createRegistro(registroPayload);
+        const existingRegistro = registros.find(
+          (registro) => registro.personaId === persona.id && registro.fecha === registroForm.fecha
+        );
+
+        if (existingRegistro) {
+          await updateRegistro(existingRegistro.id, registroPayload);
+        } else {
+          await createRegistro(registroPayload);
+        }
+
+        setFoundPersona(persona);
+        setLookupState('found');
+        setStatus({
+          type: 'success',
+          message: existingRegistro ? 'Registro actualizado correctamente.' : 'Registro guardado correctamente.'
+        });
+
+        setRegistroForm((current) => ({
+          ...current,
+          horaEntrada: '',
+          horaSalida: '',
+          observacion: ''
+        }));
       }
-
-      setFoundPersona(persona);
-      setLookupState('found');
-      setStatus({
-        type: 'success',
-        message: existingRegistro ? 'Registro actualizado correctamente.' : 'Registro guardado correctamente.'
-      });
-
-      setRegistroForm((current) => ({
-        ...current,
-        horaEntrada: '',
-        horaSalida: '',
-        observacion: ''
-      }));
 
       await refreshData();
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo guardar el registro') });
     } finally {
       setIsSavingRegistro(false);
+    }
+  };
+
+  const handleEliminarRegistro = async (registro: RegistroAsistencia): Promise<void> => {
+    const nombre = registro.persona
+      ? `${registro.persona.nombres} ${registro.persona.apellidos}`.trim()
+      : `#${registro.id}`;
+    const confirmado = window.confirm(`¿Eliminar la novedad de ${nombre} del ${registro.fecha}?`);
+
+    if (!confirmado) return;
+
+    setIsDeletingRegistro(true);
+
+    try {
+      await deleteRegistro(registro.id);
+      setStatus({ type: 'success', message: 'Registro eliminado correctamente.' });
+      await refreshData();
+    } catch (error) {
+      setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo eliminar el registro') });
+    } finally {
+      setIsDeletingRegistro(false);
     }
   };
 
@@ -347,11 +403,13 @@ export const useDashboard = () => {
     cargoForm,
     personaForm,
     editingPersonaId,
+    editingRegistroId,
     status,
     lookupState,
     foundPersona,
     isLoading,
     isSavingRegistro,
+    isDeletingRegistro,
     isSavingCargo,
     isSavingPersona,
     summary,
@@ -360,11 +418,14 @@ export const useDashboard = () => {
     updatePersonaField,
     handleBuscarCedula,
     handleGuardarRegistro,
+    handleEliminarRegistro,
     handleGuardarCargo,
     handleGuardarPersona,
     handleSelectPersona,
     loadPersonaForEdit,
+    loadRegistroForEdit,
     resetPersonaForm,
+    resetRegistroForm,
     refreshData
   };
 };

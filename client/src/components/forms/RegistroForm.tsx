@@ -9,9 +9,11 @@ interface RegistroFormProps {
   personaEncontrada: Persona | null;
   lookupState: LookupState;
   isSaving: boolean;
+  isEditing: boolean;
   onChange: <K extends keyof RegistroFormValues>(field: K, value: RegistroFormValues[K]) => void;
   onBuscarCedula: () => void;
   onSelectPersona: (personaId: number | null) => void;
+  onReset: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
@@ -22,9 +24,11 @@ export const RegistroForm = ({
   personaEncontrada,
   lookupState,
   isSaving,
+  isEditing,
   onChange,
   onBuscarCedula,
   onSelectPersona,
+  onReset,
   onSubmit
 }: RegistroFormProps) => {
   return (
@@ -32,7 +36,7 @@ export const RegistroForm = ({
       <div className="panel-header">
         <div>
           <span className="section-label">Entrada de datos</span>
-          <h2>Registrar asistencia</h2>
+          <h2>{isEditing ? 'Editar novedad' : 'Registrar asistencia'}</h2>
         </div>
         <button type="button" className="ghost-button" onClick={onBuscarCedula}>
           Buscar cédula
@@ -40,9 +44,9 @@ export const RegistroForm = ({
       </div>
 
       <form className="stack-form" onSubmit={onSubmit}>
-        <div className="form-grid form-grid--three">
+        <div className="formgrid form-grid--three">
           <label>
-            Usuario existente
+            Usuario existente 
             <select
               value={personaEncontrada ? personaEncontrada.id : ''}
               onChange={(event) => onSelectPersona(event.target.value ? Number(event.target.value) : null)}
@@ -70,13 +74,17 @@ export const RegistroForm = ({
               onChange={(event) => onChange('nombres', event.target.value)}
               placeholder="Juan Carlos"
             />
-          </label>Ñ
+          </label>
         </div>
 
         <div className="form-grid form-grid--three">
           <label>
             Cargo
-            <select value={values.cargoId} onChange={(event) => onChange('cargoId', event.target.value)}>
+            <select
+              value={values.cargoId}
+              onChange={(event) => onChange('cargoId', event.target.value)}
+              disabled={!!personaEncontrada}
+            >
               <option value="">Selecciona un cargo</option>
               {cargos.map((cargo) => (
                 <option key={cargo.id} value={cargo.id}>
@@ -157,10 +165,15 @@ export const RegistroForm = ({
 
         <div className="form-actions">
           <p className="helper-text">
-            Si la cédula no existe, el sistema crea la persona y luego guarda la novedad.
+            {isEditing
+              ? 'Editando la novedad seleccionada.'
+              : 'Si la cédula no existe, el sistema crea la persona y luego guarda la novedad.'}
           </p>
+          <button type="button" className="ghost-button" onClick={onReset} disabled={!isEditing || isSaving}>
+            Cancelar edición
+          </button>
           <button type="submit" className="primary-button" disabled={isSaving}>
-            {isSaving ? 'Guardando...' : 'Guardar novedad'}
+            {isSaving ? 'Guardando...' : isEditing ? 'Actualizar novedad' : 'Guardar novedad'}
           </button>
         </div>
       </form>

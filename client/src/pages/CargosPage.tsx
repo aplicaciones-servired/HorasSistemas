@@ -1,6 +1,7 @@
 import { CargoForm } from '../components/forms/CargoForm';
 import { DashboardHeader } from '../components/layout/DashboardHeader';
 import { CargosTable } from '../components/tables/CargosTable';
+import { StatusToaster } from '../components/toast/StatusToaster';
 import { useDashboard } from '../hooks/useDashboard';
 
 export const CargosPage = () => {
@@ -17,11 +18,7 @@ export const CargosPage = () => {
         ]}
       />
 
-      {dashboard.status.type !== 'idle' ? (
-        <section className={`status-banner status-banner--${dashboard.status.type}`} aria-live="polite">
-          {dashboard.status.message}
-        </section>
-      ) : null}
+      <StatusToaster status={dashboard.status} />
 
       <section className="workspace-grid workspace-grid--single">
         <CargoForm

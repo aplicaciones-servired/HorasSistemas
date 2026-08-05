@@ -4,6 +4,7 @@ import personaRoutes from './personaRoutes';
 import registroRoutes from './registroRoutes';
 import reporteRoutes from './reporteRoutes';
 import nominaRoutes from './nominaRoutes';
+import horasExtrasRoutes from './horasExtrasRoutes';
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use('/personas', personaRoutes);
 router.use('/registros', registroRoutes);
 router.use('/reportes', reporteRoutes);
 router.use('/nomina', nominaRoutes);
+router.use('/horas-extras', horasExtrasRoutes);
 
 export default router;

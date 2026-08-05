@@ -2,6 +2,7 @@ import { RegistroForm } from '../components/forms/RegistroForm';
 import { DashboardHeader } from '../components/layout/DashboardHeader';
 import { RegistrosTable } from '../components/tables/RegistrosTable';
 import { useDashboard } from '../hooks/useDashboard';
+import { StatusToaster } from '../components/toast/StatusToaster';
 import { reporteService } from '../services/reporteService';
 import { useState } from 'react';
 
@@ -31,6 +32,17 @@ export const NovedadesPage = () => {
     }
   };
 
+  const handleDescargarHorasExtras = async () => {
+    try {
+      setDescargando(true);
+      await reporteService.descargarHorasExtras();
+    } catch (error) {
+      console.error('Error descargando horas extras:', error);
+    } finally {
+      setDescargando(false);
+    }
+  };
+
   return (
     <>
       <DashboardHeader
@@ -39,11 +51,7 @@ export const NovedadesPage = () => {
         pills={dashboard.summary}
       />
 
-      {dashboard.status.type !== 'idle' ? (
-        <section className={`status-banner status-banner--${dashboard.status.type}`} aria-live="polite">
-          {dashboard.status.message}
-        </section>
-      ) : null}
+      <StatusToaster status={dashboard.status} />
 
       <section className="workspace-grid workspace-grid--single">
         <RegistroForm
@@ -53,9 +61,11 @@ export const NovedadesPage = () => {
           personaEncontrada={dashboard.foundPersona}
           lookupState={dashboard.lookupState}
           isSaving={dashboard.isSavingRegistro}
+          isEditing={!!dashboard.editingRegistroId}
           onChange={dashboard.updateRegistroField}
           onBuscarCedula={dashboard.handleBuscarCedula}
           onSelectPersona={dashboard.handleSelectPersona}
+          onReset={dashboard.resetRegistroForm}
           onSubmit={dashboard.handleGuardarRegistro}
         />
       </section>
@@ -67,7 +77,15 @@ export const NovedadesPage = () => {
           onClick={handleDescargarExcel}
           disabled={descargando || dashboard.registros.length === 0}
         >
-          {descargando ? 'Descargando...' : '� Asistencia'}
+          {descargando ? 'Descargando...' : '📋 Asistencia'}
+        </button>
+        <button
+          type="button"
+          className="primary-button"
+          onClick={handleDescargarHorasExtras}
+          disabled={descargando || dashboard.registros.length === 0}
+        >
+          {descargando ? 'Descargando...' : '⏰ Horas Extras'}
         </button>
         <button
           type="button"
@@ -79,7 +97,11 @@ export const NovedadesPage = () => {
         </button>
       </div>
 
-      <RegistrosTable registros={dashboard.registros} />
+      <RegistrosTable
+        registros={dashboard.registros}
+        onEdit={dashboard.loadRegistroForEdit}
+        onDelete={dashboard.handleEliminarRegistro}
+      />
 
       {dashboard.isLoading ? <div className="loading-banner">Cargando datos iniciales...</div> : null}
     </>

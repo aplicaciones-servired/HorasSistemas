@@ -2,12 +2,14 @@ import type { RegistroAsistencia } from '../../types/domain';
 
 interface RegistrosTableProps {
   registros: RegistroAsistencia[];
+  onEdit: (registro: RegistroAsistencia) => void;
+  onDelete: (registro: RegistroAsistencia) => void;
 }
 
 const formatDate = (value: string): string =>
   new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' }).format(new Date(`${value}T00:00:00`));
 
-export const RegistrosTable = ({ registros }: RegistrosTableProps) => {
+export const RegistrosTable = ({ registros, onEdit, onDelete }: RegistrosTableProps) => {
   return (
     <section className="panel panel--table">
       <div className="panel-header">
@@ -27,12 +29,13 @@ export const RegistrosTable = ({ registros }: RegistrosTableProps) => {
               <th>Entrada</th>
               <th>Salida</th>
               <th>Observación</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {registros.length === 0 ? (
               <tr>
-                <td colSpan={6} className="empty-state">
+                <td colSpan={7} className="empty-state">
                   Todavía no hay registros guardados.
                 </td>
               </tr>
@@ -47,6 +50,16 @@ export const RegistrosTable = ({ registros }: RegistrosTableProps) => {
                   <td>{registro.horaEntrada}</td>
                   <td>{registro.horaSalida}</td>
                   <td>{registro.observacion ?? '—'}</td>
+                  <td>
+                    <span className="table-actions">
+                      <button type="button" className="button-sm ghost-button" onClick={() => onEdit(registro)}>
+                        Editar
+                      </button>
+                      <button type="button" className="button-sm danger-button" onClick={() => onDelete(registro)}>
+                        Eliminar
+                      </button>
+                    </span>
+                  </td>
                 </tr>
               ))
             )}

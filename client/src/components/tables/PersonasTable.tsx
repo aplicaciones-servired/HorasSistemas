@@ -43,7 +43,7 @@ export const PersonasTable = ({ personas, onEdit }: PersonasTableProps) => {
                   <td>{persona.cargo?.nombre ?? 'Sin cargo'}</td>
                   <td>{persona.activo ? 'Activo' : 'Inactivo'}</td>
                   <td>
-                    <button type="button" className="text-button" onClick={() => onEdit(persona)}>
+                    <button type="button" className="button-sm ghost-button" onClick={() => onEdit(persona)}>
                       Editar
                     </button>
                   </td>
