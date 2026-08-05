@@ -162,7 +162,7 @@ function textoCompania(): { richText: ExcelJS.RichText[] } {
   return {
     richText: [
       { font: { bold: true, size: 5, name: 'Arial' }, text: 'Grupo Empresarial Servired S.A. ' },
-      { font: { bold: true, underline: true, size: 5, name: 'Arial' }, text: '       ' },
+      { font: { bold: true, underline: true, size: 5, name: 'Arial' }, text: '\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0' },
       { font: { bold: true, size: 5, name: 'Arial' }, text: 'Grupo Empresarial Multired S.A. _' },
       { font: { bold: true, underline: true, size: 5, name: 'Arial' }, text: 'X' },
       { font: { bold: true, size: 5, name: 'Arial' }, text: '_' }
@@ -279,11 +279,14 @@ export class HorasExtrasService {
 
     worksheet.getCell('A5').value = 'PERIODO:';
     worksheet.getCell('C5').value = periodo;
+    worksheet.getCell('E5').value = 'COMPAÑÍA';
     worksheet.getCell('G5').value = textoCompania();
 
     worksheet.getCell('A5').font = fuenteTitulo;
     worksheet.getCell('C5').font = fuenteTitulo;
     worksheet.getCell('C5').alignment = { horizontal: 'left', vertical: 'top', wrapText: true, indent: 8 };
+    worksheet.getCell('E5').font = fuenteTitulo;
+    worksheet.getCell('E5').alignment = { horizontal: 'left', vertical: 'top', wrapText: true, indent: 3 };
     worksheet.getCell('G5').alignment = { horizontal: 'center', vertical: 'top', wrapText: true };
 
     worksheet.mergeCells('A6:Q6');
@@ -465,6 +468,21 @@ export class HorasExtrasService {
         footer: 0.3
       }
     };
+
+    // Vista del libro (zoom y vista previa de salto de página igual al original)
+    worksheet.views = [
+      {
+        state: 'normal',
+        style: 'pageBreakPreview',
+        rightToLeft: false,
+        activeCell: `A${filaObs}`,
+        showRuler: true,
+        showRowColHeaders: true,
+        showGridLines: true,
+        zoomScale: 150,
+        zoomScaleNormal: 150
+      }
+    ];
 
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
