@@ -34,7 +34,7 @@ export const RegistroForm = ({
   onSelectPersona,
   onReset,
   onSubmit,
-  onDeletePersona
+  // onDeletePersona
 }: RegistroFormProps) => {
   return (
     <section className="panel panel--main">
@@ -195,7 +195,7 @@ export const RegistroForm = ({
             />
           </label>
 
-          {personaEncontrada ? (
+          {/* {personaEncontrada ? (
             <div className="person-chip">
               <div className="person-chip__header">
                 <div>
@@ -214,7 +214,7 @@ export const RegistroForm = ({
                 </button>
               </div>
             </div>
-          ) : null}
+          ) : null} */}
 
           <div className="form-actions">
             <p className="helper-text">
