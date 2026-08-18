@@ -21,7 +21,7 @@ services:
     container_name: web_horas
     image: web-horas
     expose:
-      - "4321"
+      - "5174"
     depends_on:
       - horas-server-1
     networks:
