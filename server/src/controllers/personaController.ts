@@ -25,10 +25,11 @@ export const findPersonaByCedula = async (request: Request, response: Response):
 };
 
 export const createPersona = async (request: Request, response: Response): Promise<void> => {
-  const { cedula, nombres, apellidos, cargoId, activo } = request.body as {
+  const { cedula, nombres, apellidos, empresa, cargoId, activo } = request.body as {
     cedula?: string;
     nombres?: string;
     apellidos?: string;
+    empresa?: string | null;
     cargoId?: number | null;
     activo?: boolean;
   };
@@ -42,6 +43,7 @@ export const createPersona = async (request: Request, response: Response): Promi
     cedula,
     nombres,
     apellidos,
+    empresa: empresa ?? null,
     cargoId: cargoId ?? null,
     activo: activo ?? true
   });
@@ -58,10 +60,11 @@ export const updatePersona = async (request: Request, response: Response): Promi
     return;
   }
 
-  const { cedula, nombres, apellidos, cargoId, activo } = request.body as {
+  const { cedula, nombres, apellidos, empresa, cargoId, activo } = request.body as {
     cedula?: string;
     nombres?: string;
     apellidos?: string;
+    empresa?: string | null;
     cargoId?: number | null;
     activo?: boolean;
   };
@@ -69,6 +72,7 @@ export const updatePersona = async (request: Request, response: Response): Promi
   if (cedula !== undefined) persona.cedula = cedula;
   if (nombres !== undefined) persona.nombres = nombres;
   if (apellidos !== undefined) persona.apellidos = apellidos;
+  if (empresa !== undefined) persona.empresa = empresa;
   if (cargoId !== undefined) persona.cargoId = cargoId;
   if (activo !== undefined) persona.activo = activo;
 

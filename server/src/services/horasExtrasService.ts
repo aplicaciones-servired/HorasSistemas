@@ -1,4 +1,6 @@
 import ExcelJS from 'exceljs';
+import path from 'path';
+import fs from 'fs';
 import { RegistroAsistencia, Persona, Cargo } from '../models';
 
 // Reglas de cálculo (estándar laboral colombiano)
@@ -34,9 +36,11 @@ interface FilaReporte {
   nombre: string;
   cedula: string;
   cargo: string;
+  empresa: string;
   fecha: string;
   horaEntrada: string;
   horaSalida: string;
+  esDominical: boolean;
   horas: HorasCalculadas;
 }
 
@@ -199,18 +203,25 @@ export class HorasExtrasService {
           nombre: persona ? `${persona.nombres} ${persona.apellidos}`.trim() : '',
           cedula: persona?.cedula || '',
           cargo: cargo?.nombre || '',
+          empresa: persona?.empresa || '',
           fecha: registro.fecha,
           horaEntrada: formatoHora(registro.horaEntrada),
           horaSalida: formatoHora(registro.horaSalida),
+          esDominical: Boolean(registro.esDominical),
           horas: calcularHoras(minutos, Boolean(registro.esDominical))
         };
       })
       .sort((a, b) => {
+        // 1. Dominicales/festivos primero
+        if (a.esDominical !== b.esDominical) return a.esDominical ? -1 : 1;
+        // 2. Por nombre
+        const porNombre = a.nombre.localeCompare(b.nombre);
+        if (porNombre !== 0) return porNombre;
+        // 3. Por fecha
         const porFecha = a.fecha.localeCompare(b.fecha);
         if (porFecha !== 0) return porFecha;
-        const porEntrada = a.horaEntrada.localeCompare(b.horaEntrada);
-        if (porEntrada !== 0) return porEntrada;
-        return a.nombre.localeCompare(b.nombre);
+        // 4. Por hora de entrada
+        return a.horaEntrada.localeCompare(b.horaEntrada);
       });
 
     const workbook = new ExcelJS.Workbook();
@@ -411,7 +422,7 @@ export class HorasExtrasService {
 
     worksheet.getCell(`A${filaObs}`).value = 'OBSERVACIONES:';
     worksheet.getCell(`A${filaNota}`).value =
-      'LOS TÉCNICOS QUE TRABAJAN HASTA LAS 20:00 SE TOMAN UNA HORA DE ALMUERZO DURANTE LA JORNADA.';
+      'LOS TÉCNICOS QUE TRABAJAN HASTA LAS 19:00 SE TOMAN UNA HORA DE ALMUERZO DURANTE LA JORNADA.';
     worksheet.getCell(`A${filaElab}`).value = 'ELABORADO POR:';
     worksheet.getCell(`A${filaElab + 1}`).value = 'CARGO:';
     worksheet.getCell(`A${filaElab + 2}`).value = 'FIRMA:';
@@ -427,13 +438,41 @@ export class HorasExtrasService {
     worksheet.getCell(`D${filaElab + 1}`).font = fuenteValorFirma;
     worksheet.getCell(`D${filaElab + 1}`).alignment = { horizontal: 'left', vertical: 'top', wrapText: true, indent: 5 };
 
+    // Insertar logo de la empresa en el encabezado (A1:B3)
+    const logoPath = path.resolve(__dirname, '../../../client/src/assets/LOGO.png');
+    if (fs.existsSync(logoPath)) {
+      const logoId = workbook.addImage({
+        filename: logoPath,
+        extension: 'png'
+      });
+      worksheet.addImage(logoId, {
+        tl: { col: 0, row: 0.3 },
+        ext: { width: 160, height: 52 }
+      });
+    }
+
+    // Insertar firma de Jhon Sebastian Carvajal Colorado
+    const firmaPath = path.resolve(__dirname, '../../../client/src/assets/FIRMA.png');
+    if (fs.existsSync(firmaPath)) {
+      const firmaId = workbook.addImage({
+        filename: firmaPath,
+        extension: 'png'
+      });
+      worksheet.addImage(firmaId, {
+        tl: { col: 3, row: filaElab + 0.15 },
+        ext: { width: 165, height: 42 }
+      });
+    }
+
+    worksheet.getCell(`D${filaElab}`).value = 'Jhon Sebastian Carvajal Colorado';
+
     // Bordes en toda la tabla
     aplicarBordes(worksheet, filaElab + 2);
 
     // Altura de filas
-    worksheet.getRow(1).height = 8.85;
-    worksheet.getRow(2).height = 8.85;
-    worksheet.getRow(3).height = 8.85;
+    worksheet.getRow(1).height = 18.7;
+    worksheet.getRow(2).height = 18.7;
+    worksheet.getRow(3).height = 18.7;
     worksheet.getRow(4).height = 6.6;
     worksheet.getRow(5).height = 10.7;
     worksheet.getRow(6).height = 6.6;
@@ -446,41 +485,39 @@ export class HorasExtrasService {
     worksheet.getRow(filaObs).height = 8.85;
     worksheet.getRow(filaNota).height = 26.25;
     worksheet.getRow(filaEspacio).height = 6.6;
-    worksheet.getRow(filaElab).height = 8.85;
-    worksheet.getRow(filaElab + 1).height = 8.85;
-    worksheet.getRow(filaElab + 2).height = 18;
+    worksheet.getRow(filaElab).height = 24;
+    worksheet.getRow(filaElab + 1).height = 24;
+    worksheet.getRow(filaElab + 2).height = 24;
 
     // Configuración de impresión
     worksheet.pageSetup = {
       orientation: 'portrait',
-      fitToPage: false,
-      scale: 53,
+      fitToPage: true,
       fitToWidth: 1,
-      fitToHeight: 1,
+      fitToHeight: 0,
       pageOrder: 'downThenOver',
       paperSize: 9,
       margins: {
-        left: 0.7,
-        right: 0.7,
-        top: 0.75,
-        bottom: 0.75,
+        left: 0.5,
+        right: 0.5,
+        top: 0.5,
+        bottom: 0.5,
         header: 0.3,
         footer: 0.3
       }
     };
 
-    // Vista del libro (zoom y vista previa de salto de página igual al original)
+    // Vista del libro
     worksheet.views = [
       {
         state: 'normal',
-        style: 'pageBreakPreview',
         rightToLeft: false,
         activeCell: `A${filaObs}`,
         showRuler: true,
         showRowColHeaders: true,
         showGridLines: true,
-        zoomScale: 150,
-        zoomScaleNormal: 150
+        zoomScale: 100,
+        zoomScaleNormal: 100
       }
     ];
 

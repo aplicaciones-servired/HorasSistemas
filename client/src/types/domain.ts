@@ -9,6 +9,7 @@ export interface Persona {
   cedula: string;
   nombres: string;
   apellidos: string;
+  empresa: string | null;
   cargoId: number | null;
   activo: boolean;
   cargo?: Cargo | null;
@@ -31,8 +32,10 @@ export interface RegistroFormValues {
   cedula: string;
   nombres: string;
   apellidos: string;
+  empresa: string;
   cargoId: string;
   fecha: string;
+  fechas: string[];
   horaEntrada: string;
   horaSalida: string;
   observacion: string;
@@ -48,6 +51,7 @@ export interface PersonaFormValues {
   cedula: string;
   nombres: string;
   apellidos: string;
+  empresa: string;
   cargoId: string;
   activo: boolean;
 }
@@ -55,3 +59,18 @@ export interface PersonaFormValues {
 export type StatusType = 'idle' | 'info' | 'success' | 'error';
 
 export type LookupState = 'idle' | 'loading' | 'found' | 'not-found' | 'error';
+
+export interface Turno {
+  id: number;
+  nombre: string;
+  horaEntrada: string;
+  horaSalida: string;
+  esDominical: boolean;
+}
+
+export interface TurnoFormValues {
+  nombre: string;
+  horaEntrada: string;
+  horaSalida: string;
+  esDominical: boolean;
+}

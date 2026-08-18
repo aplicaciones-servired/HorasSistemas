@@ -10,27 +10,27 @@ export const NovedadesPage = () => {
   const dashboard = useDashboard();
   const [descargando, setDescargando] = useState(false);
 
-  const handleDescargarExcel = async () => {
-    try {
-      setDescargando(true);
-      await reporteService.descargarAsistencia();
-    } catch (error) {
-      console.error('Error descargando Excel:', error);
-    } finally {
-      setDescargando(false);
-    }
-  };
+  // const handleDescargarExcel = async () => {
+  //   try {
+  //     setDescargando(true);
+  //     await reporteService.descargarAsistencia();
+  //   } catch (error) {
+  //     console.error('Error descargando Excel:', error);
+  //   } finally {
+  //     setDescargando(false);
+  //   }
+  // };
 
-  const handleDescargarNomina = async () => {
-    try {
-      setDescargando(true);
-      await reporteService.descargarNomina();
-    } catch (error) {
-      console.error('Error descargando nómina:', error);
-    } finally {
-      setDescargando(false);
-    }
-  };
+  // const handleDescargarNomina = async () => {
+  //   try {
+  //     setDescargando(true);
+  //     await reporteService.descargarNomina();
+  //   } catch (error) {
+  //     console.error('Error descargando nómina:', error);
+  //   } finally {
+  //     setDescargando(false);
+  //   }
+  // };
 
   const handleDescargarHorasExtras = async () => {
     try {
@@ -58,6 +58,7 @@ export const NovedadesPage = () => {
           values={dashboard.registroForm}
           cargos={dashboard.cargos}
           personas={dashboard.personas}
+          turnos={dashboard.turnos}
           personaEncontrada={dashboard.foundPersona}
           lookupState={dashboard.lookupState}
           isSaving={dashboard.isSavingRegistro}
@@ -67,18 +68,19 @@ export const NovedadesPage = () => {
           onSelectPersona={dashboard.handleSelectPersona}
           onReset={dashboard.resetRegistroForm}
           onSubmit={dashboard.handleGuardarRegistro}
+          onDeletePersona={dashboard.handleEliminarPersona}
         />
       </section>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', marginBottom: '10px', gap: '12px' }}>
-        <button
+        {/* <button
           type="button"
           className="ghost-button"
           onClick={handleDescargarExcel}
           disabled={descargando || dashboard.registros.length === 0}
         >
           {descargando ? 'Descargando...' : '📋 Asistencia'}
-        </button>
+        </button> */}
         <button
           type="button"
           className="primary-button"
@@ -87,14 +89,14 @@ export const NovedadesPage = () => {
         >
           {descargando ? 'Descargando...' : '⏰ Horas Extras'}
         </button>
-        <button
+        {/* <button
           type="button"
           className="primary-button"
           onClick={handleDescargarNomina}
           disabled={descargando || dashboard.registros.length === 0}
         >
           {descargando ? 'Descargando...' : '💰 Nómina'}
-        </button>
+        </button> */}
       </div>
 
       <RegistrosTable

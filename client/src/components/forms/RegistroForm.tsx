@@ -1,11 +1,13 @@
 import type { FormEvent } from 'react';
-import type { Cargo, LookupState, Persona, RegistroFormValues } from '../../types/domain';
+import type { Cargo, LookupState, Persona, RegistroFormValues, Turno } from '../../types/domain';
+import { CalendarMultiDate } from '../ui/CalendarMultiDate';
 import '../../index.css';
 
 interface RegistroFormProps {
   values: RegistroFormValues;
   cargos: Cargo[];
   personas: Persona[];
+  turnos: Turno[];
   personaEncontrada: Persona | null;
   lookupState: LookupState;
   isSaving: boolean;
@@ -15,12 +17,14 @@ interface RegistroFormProps {
   onSelectPersona: (personaId: number | null) => void;
   onReset: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onDeletePersona: (persona: Persona) => void;
 }
 
 export const RegistroForm = ({
   values,
   cargos,
   personas,
+  turnos,
   personaEncontrada,
   lookupState,
   isSaving,
@@ -29,7 +33,8 @@ export const RegistroForm = ({
   onBuscarCedula,
   onSelectPersona,
   onReset,
-  onSubmit
+  onSubmit,
+  onDeletePersona
 }: RegistroFormProps) => {
   return (
     <section className="panel panel--main">
@@ -46,7 +51,7 @@ export const RegistroForm = ({
       <form className="stack-form" onSubmit={onSubmit}>
         <div className="formgrid form-grid--three">
           <label>
-            Usuario existente 
+            Usuario existente
             <select
               value={personaEncontrada ? personaEncontrada.id : ''}
               onChange={(event) => onSelectPersona(event.target.value ? Number(event.target.value) : null)}
@@ -98,10 +103,6 @@ export const RegistroForm = ({
               ))}
             </select>
           </label>
-          <label>
-            Fecha
-            <input type="date" value={values.fecha} onChange={(event) => onChange('fecha', event.target.value)} />
-          </label>
           <div className="lookup-box">
             <span className="">Estado de búsqueda</span>
             <strong data-state={lookupState}>
@@ -114,39 +115,35 @@ export const RegistroForm = ({
           </div>
         </div>
 
+        <div>
+          <span className="cal-label-title">Fechas de asistencia</span>
+          <CalendarMultiDate
+            selected={values.fechas}
+            onChange={(fechas) => onChange('fechas', fechas)}
+          />
+        </div>
+
         <div className="quick-shifts">
           <span className="quick-shifts__label">Turnos rápidos</span>
-          <button
-            type="button"
-            className="ghost-button"
-            onClick={() => {
-              onChange('horaEntrada', '14:30');
-              onChange('horaSalida', '21:30');
-            }}
-          >
-            2:30 PM – 9:30 PM
-          </button>
-          <button
-            type="button"
-            className="ghost-button"
-            onClick={() => {
-              onChange('horaEntrada', '06:30');
-              onChange('horaSalida', '13:30');
-            }}
-          >
-            6:30 AM – 1:30 PM
-          </button>
-          <button
-            type="button"
-            className="ghost-button"
-            onClick={() => {
-              onChange('horaEntrada', '08:00');
-              onChange('horaSalida', '19:00');
-              onChange('esDominical', true);
-            }}
-          >
-            Festivo/Dominical 8 AM – 7 PM
-          </button>
+          {turnos.map((turno) => (
+            <button
+              key={turno.id}
+              type="button"
+              className="ghost-button"
+              onClick={() => {
+                onChange('horaEntrada', turno.horaEntrada);
+                onChange('horaSalida', turno.horaSalida);
+                if (turno.esDominical) {
+                  onChange('esDominical', true);
+                }
+              }}
+            >
+              {turno.nombre}
+            </button>
+          ))}
+          {turnos.length === 0 && (
+            <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>No hay turnos creados</span>
+          )}
         </div>
 
         <div className="form-grid form-grid--two">
@@ -195,11 +192,22 @@ export const RegistroForm = ({
 
         {personaEncontrada ? (
           <div className="person-chip">
-            <span>Persona cargada</span>
-            <strong>
-              {personaEncontrada.nombres} {personaEncontrada.apellidos}
-            </strong>
-            <small>Cédula {personaEncontrada.cedula}</small>
+            <div className="person-chip__header">
+              <div>
+                <span>Persona cargada</span>
+                <strong>
+                  {personaEncontrada.nombres} {personaEncontrada.apellidos}
+                </strong>
+                <small>Cédula {personaEncontrada.cedula}</small>
+              </div>
+              <button
+                type="button"
+                className="button-sm danger-button"
+                onClick={() => onDeletePersona(personaEncontrada)}
+              >
+                Eliminar usuario
+              </button>
+            </div>
           </div>
         ) : null}
 
@@ -207,13 +215,15 @@ export const RegistroForm = ({
           <p className="helper-text">
             {isEditing
               ? 'Editando la novedad seleccionada.'
-              : 'Si la cédula no existe, el sistema crea la persona y luego guarda la novedad.'}
+              : values.fechas.length > 1
+                ? `Se crearán ${values.fechas.length} registros, uno por cada fecha seleccionada.`
+                : 'Si la cédula no existe, el sistema crea la persona y luego guarda la novedad.'}
           </p>
           <button type="button" className="ghost-button" onClick={onReset} disabled={!isEditing || isSaving}>
             Cancelar edición
           </button>
-          <button type="submit" className="primary-button" disabled={isSaving}>
-            {isSaving ? 'Guardando...' : isEditing ? 'Actualizar novedad' : 'Guardar novedad'}
+          <button type="submit" className="primary-button" disabled={isSaving || values.fechas.length === 0}>
+            {isSaving ? 'Guardando...' : isEditing ? 'Actualizar novedad' : values.fechas.length > 1 ? `Guardar ${values.fechas.length} registros` : 'Guardar novedad'}
           </button>
         </div>
       </form>

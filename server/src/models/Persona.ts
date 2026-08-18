@@ -7,19 +7,21 @@ export interface PersonaAttributes {
   cedula: string;
   nombres: string;
   apellidos: string;
+  empresa: string | null;
   cargoId: number | null;
   activo: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export type PersonaCreationAttributes = Optional<PersonaAttributes, 'id' | 'cargoId' | 'activo'>;
+export type PersonaCreationAttributes = Optional<PersonaAttributes, 'id' | 'empresa' | 'cargoId' | 'activo'>;
 
 export class Persona extends Model<PersonaAttributes, PersonaCreationAttributes> implements PersonaAttributes {
   declare id: number;
   declare cedula: string;
   declare nombres: string;
   declare apellidos: string;
+  declare empresa: string | null;
   declare cargoId: number | null;
   declare activo: boolean;
   declare createdAt: Date;
@@ -45,6 +47,10 @@ Persona.init(
     apellidos: {
       type: DataTypes.STRING(120),
       allowNull: false
+    },
+    empresa: {
+      type: DataTypes.STRING(60),
+      allowNull: true
     },
     cargoId: {
       type: DataTypes.BIGINT.UNSIGNED,

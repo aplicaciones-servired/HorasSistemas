@@ -5,6 +5,7 @@ export interface PersonaPayload {
   cedula: string;
   nombres: string;
   apellidos: string;
+  empresa: string | null;
   cargoId: number | null;
   activo?: boolean;
 }
@@ -27,4 +28,8 @@ export const createPersona = async (payload: PersonaPayload): Promise<Persona> =
 export const updatePersona = async (id: number, payload: PersonaPayload): Promise<Persona> => {
   const response = await api.put<Persona>(`/personas/${id}`, payload);
   return response.data;
+};
+
+export const deletePersona = async (id: number): Promise<void> => {
+  await api.delete(`/personas/${id}`);
 };
