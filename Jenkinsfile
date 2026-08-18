@@ -20,7 +20,7 @@ pipeline {
         
 
           writeFile file: './server/.env', text: env_server
-          writeFile file: './client/.env', text: env_client_completo
+          writeFile file: './client/.env', text: env_client
           
           // Verificar
           sh 'ls -la ./server/.env'
