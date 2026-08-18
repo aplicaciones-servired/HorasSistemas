@@ -1,9 +1,8 @@
 import axios from 'axios';
-
-const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
+import { URL_DATA_HORAS } from '../util/const';
 
 export const api = axios.create({
-  baseURL,
+  baseURL: URL_DATA_HORAS,
   timeout: 15000
 });
 

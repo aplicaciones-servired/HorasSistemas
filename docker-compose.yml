@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  # --- Backend API principal
+  horas-server-1:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: horas-server-1
+    image: horas-server
+    networks:
+      - red-gane-int
+    env_file:
+      - ./server/.env
+
+  # --- Frontend Astro SSR (Node)
+  web_horas:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: web_horas
+    image: web-horas
+    expose:
+      - "4321"
+    depends_on:
+      - horas-server-1
+    networks:
+      - red-gane-int
+    env_file:
+      - ./client/.env
+    # Opcional: montar el .env como volumen en desarrollo
+    volumes:
+      - ./client/.env:/app/.env:ro
+networks:
+  red-gane-int:
+    external: true

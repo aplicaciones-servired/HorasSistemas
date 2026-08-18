@@ -4,10 +4,9 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
-    "build": "tsc -p tsconfig.json",
-    "start": "node dist/server.js",
-    "db:sync": "ts-node src/scripts/syncDatabase.ts"
+    "start": "node --env-file=.env ./dist/index.js",
+    "dev": "tsx watch --env-file=.env ./src/index.ts",
+    "build": "tsc"
   },
   "dependencies": {
     "cors": "^2.8.5",

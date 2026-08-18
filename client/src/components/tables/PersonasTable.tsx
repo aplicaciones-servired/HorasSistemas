@@ -21,6 +21,7 @@ export const PersonasTable = ({ personas, onEdit }: PersonasTableProps) => {
             <tr>
               <th>Cédula</th>
               <th>Nombre</th>
+              <th>Empresa</th>
               <th>Cargo</th>
               <th>Estado</th>
               <th></th>
@@ -29,7 +30,7 @@ export const PersonasTable = ({ personas, onEdit }: PersonasTableProps) => {
           <tbody>
             {personas.length === 0 ? (
               <tr>
-                <td colSpan={5} className="empty-state">
+                <td colSpan={6} className="empty-state">
                   Todavía no hay usuarios registrados.
                 </td>
               </tr>
@@ -40,6 +41,7 @@ export const PersonasTable = ({ personas, onEdit }: PersonasTableProps) => {
                   <td>
                     {persona.nombres} {persona.apellidos}
                   </td>
+                  <td>{persona.empresa ?? '—'}</td>
                   <td>{persona.cargo?.nombre ?? 'Sin cargo'}</td>
                   <td>{persona.activo ? 'Activo' : 'Inactivo'}</td>
                   <td>

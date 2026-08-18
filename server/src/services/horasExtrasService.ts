@@ -27,9 +27,9 @@ const MESES = [
 ];
 
 const ANCHO_COLUMNAS = [
-  3.33203125, 18.83203125, 18.83203125, 29.5, 8.5, 8.5, 8.5, 8.5, 8.1640625,
-  8.83203125, 8.6640625, 8.83203125, 8.6640625, 8.83203125, 8.6640625,
-  8.83203125, 8.6640625,
+  4.33, 24.5, 24.5, 38.35, 11.05, 11.05, 11.05, 11.05, 10.61,
+  11.48, 11.26, 11.48, 11.26, 11.48, 11.26,
+  11.48, 11.26,
 ];
 
 interface HorasCalculadas {
@@ -182,22 +182,22 @@ function textoCompania(): { richText: ExcelJS.RichText[] } {
   return {
     richText: [
       {
-        font: { bold: true, size: 5, name: "Arial" },
+        font: { bold: true, size: 8, name: "Arial" },
         text: "Grupo Empresarial Servired S.A. ",
       },
       {
-        font: { bold: true, underline: true, size: 5, name: "Arial" },
+        font: { bold: true, underline: true, size: 8, name: "Arial" },
         text: "\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0",
       },
       {
-        font: { bold: true, size: 5, name: "Arial" },
+        font: { bold: true, size: 8, name: "Arial" },
         text: "Grupo Empresarial Multired S.A. _",
       },
       {
-        font: { bold: true, underline: true, size: 5, name: "Arial" },
+        font: { bold: true, underline: true, size: 8, name: "Arial" },
         text: "X",
       },
-      { font: { bold: true, size: 5, name: "Arial" }, text: "_" },
+      { font: { bold: true, size: 8, name: "Arial" }, text: "_" },
     ],
   };
 }
@@ -264,15 +264,15 @@ export class HorasExtrasService {
 
     const fuenteTitulo: Partial<ExcelJS.Font> = {
       bold: true,
-      size: 5,
+      size: 8,
       name: "Arial",
     };
     const fuenteDatos: Partial<ExcelJS.Font> = {
-      size: 5,
+      size: 8,
       name: "Calibri",
     };
     const fuenteValorFirma: Partial<ExcelJS.Font> = {
-      size: 5,
+      size: 8,
       name: "Arial MT",
     };
 
@@ -488,14 +488,14 @@ export class HorasExtrasService {
       };
     }
 
-    // RECARGO NOCTURNO: ORDINARIO y FESTIVO en Calibri 5, centrados vertical y horizontalmente
-    worksheet.getCell("H8").font = { bold: true, size: 5, name: "Calibri" };
+    // RECARGO NOCTURNO: ORDINARIO y FESTIVO en Calibri 8, centrados vertical y horizontalmente
+    worksheet.getCell("H8").font = { bold: true, size: 8, name: "Calibri" };
     worksheet.getCell("H8").alignment = {
       horizontal: "center",
       vertical: "middle",
       wrapText: true,
     };
-    worksheet.getCell("I8").font = { bold: true, size: 5, name: "Calibri" };
+    worksheet.getCell("I8").font = { bold: true, size: 8, name: "Calibri" };
     worksheet.getCell("I8").alignment = {
       horizontal: "center",
       vertical: "middle",
@@ -535,7 +535,7 @@ export class HorasExtrasService {
       });
       worksheet.getCell(filaNumero, 1).font = {
         bold: true,
-        size: 5,
+        size: 8,
         name: "Arial",
       };
       worksheet.getCell(filaNumero, 1).numFmt = "0";
@@ -559,13 +559,13 @@ export class HorasExtrasService {
         wrapText: true,
         shrinkToFit: true,
       };
-      worksheet.getCell(filaNumero, 8).font = { size: 5, name: "Calibri" };
+      worksheet.getCell(filaNumero, 8).font = { size: 8, name: "Calibri" };
       worksheet.getCell(filaNumero, 8).alignment = {
         horizontal: "center",
         vertical: "middle",
         wrapText: true,
       };
-      worksheet.getCell(filaNumero, 9).font = { size: 5, name: "Calibri" };
+      worksheet.getCell(filaNumero, 9).font = { size: 8, name: "Calibri" };
       worksheet.getCell(filaNumero, 9).alignment = {
         horizontal: "center",
         vertical: "middle",
@@ -683,8 +683,8 @@ export class HorasExtrasService {
         extension: "png",
       });
       worksheet.addImage(firmaId, {
-        tl: { col: 3.5, row: filaElab + 1 },
-        ext: { width: 162, height: 26 },
+        tl: { col: 3.5, row: filaElab - 1.5 },
+        ext: { width: 200, height: 200 },
       });
     }
 
@@ -700,24 +700,24 @@ export class HorasExtrasService {
     aplicarBordes(worksheet, filaElab + 2);
 
     // Altura de filas
-    worksheet.getRow(1).height = 18.7;
-    worksheet.getRow(2).height = 18.7;
-    worksheet.getRow(3).height = 18.7;
-    worksheet.getRow(4).height = 6.6;
-    worksheet.getRow(5).height = 10.7;
-    worksheet.getRow(6).height = 6.6;
-    worksheet.getRow(7).height = 16.5;
-    worksheet.getRow(8).height = 8.85;
+    worksheet.getRow(1).height = 28;
+    worksheet.getRow(2).height = 28;
+    worksheet.getRow(3).height = 28;
+    worksheet.getRow(4).height = 10;
+    worksheet.getRow(5).height = 16;
+    worksheet.getRow(6).height = 10;
+    worksheet.getRow(7).height = 25;
+    worksheet.getRow(8).height = 13;
     for (let i = 9; i <= ultimaFila; i++) {
-      worksheet.getRow(i).height = 8.85;
+      worksheet.getRow(i).height = 13;
     }
-    worksheet.getRow(filaVacia).height = 8.85;
-    worksheet.getRow(filaObs).height = 8.85;
-    worksheet.getRow(filaNota).height = 26.25;
-    worksheet.getRow(filaEspacio).height = 6.6;
-    worksheet.getRow(filaElab).height = 24;
-    worksheet.getRow(filaElab + 1).height = 24;
-    worksheet.getRow(filaElab + 2).height = 24;
+    worksheet.getRow(filaVacia).height = 13;
+    worksheet.getRow(filaObs).height = 13;
+    worksheet.getRow(filaNota).height = 40;
+    worksheet.getRow(filaEspacio).height = 10;
+    worksheet.getRow(filaElab).height = 36;
+    worksheet.getRow(filaElab + 1).height = 36;
+    worksheet.getRow(filaElab + 2).height = 36;
 
     // Configuración de impresión
     worksheet.pageSetup = {

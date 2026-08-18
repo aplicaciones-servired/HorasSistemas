@@ -66,6 +66,15 @@ export const PersonaForm = ({
           />
         </label>
 
+        <label>
+          Empresa
+          <input
+            value={values.empresa}
+            onChange={(event) => onChange('empresa', event.target.value)}
+            placeholder="Nombre de la empresa"
+          />
+        </label>
+
         <label className="switch-row">
           <span className="switch-row__control">
             <input

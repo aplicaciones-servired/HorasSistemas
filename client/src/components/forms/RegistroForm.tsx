@@ -103,6 +103,15 @@ export const RegistroForm = ({
               ))}
             </select>
           </label>
+          <label>
+            Empresa
+            <input
+              value={values.empresa}
+              onChange={(event) => onChange('empresa', event.target.value)}
+              placeholder="Nombre de la empresa"
+              disabled={!!personaEncontrada}
+            />
+          </label>
           <div className="lookup-box">
             <span className="">Estado de búsqueda</span>
             <strong data-state={lookupState}>
