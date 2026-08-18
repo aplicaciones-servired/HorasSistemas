@@ -20,8 +20,9 @@ services:
       dockerfile: Dockerfile
     container_name: web_horas
     image: web-horas
-    expose:
-      - "5174"
+    ports:
+      - "5174:5174"
+      - "5175:5175"
     depends_on:
       - horas-server-1
     networks:
