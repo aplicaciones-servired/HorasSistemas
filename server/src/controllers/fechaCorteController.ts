@@ -178,7 +178,7 @@ export const finalizarFechaCorte = async (req: Request, res: Response): Promise<
       filename,
       buffer: Buffer.from(buffer),
       periodo
-    }).catch((err) => console.error('Error enviando correo en background:', err));
+    }).catch((err: Error) => console.error('Error enviando correo en background:', err));
   }
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
