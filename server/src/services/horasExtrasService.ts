@@ -178,7 +178,27 @@ function formatearPeriodo(fecha: Date, conAnio: boolean): string {
     : `${dia} de ${mes}`;
 }
 
-function textoCompania(): { richText: ExcelJS.RichText[] } {
+function textoCompania(empresa?: string): { richText: ExcelJS.RichText[] } {
+  if (empresa === 'Servired') {
+    return {
+      richText: [
+        {
+          font: { bold: true, size: 8, name: "Arial" },
+          text: "Grupo Empresarial Servired S.A.",
+        },
+      ],
+    };
+  }
+  if (empresa === 'Multired') {
+    return {
+      richText: [
+        {
+          font: { bold: true, size: 8, name: "Arial" },
+          text: "Grupo Empresarial Multired S.A.",
+        },
+      ],
+    };
+  }
   return {
     richText: [
       {
@@ -197,7 +217,6 @@ function textoCompania(): { richText: ExcelJS.RichText[] } {
         font: { bold: true, underline: true, size: 8, name: "Arial" },
         text: "X",
       },
-      { font: { bold: true, size: 8, name: "Arial" }, text: "_" },
     ],
   };
 }
@@ -217,8 +236,16 @@ function aplicarBordes(worksheet: ExcelJS.Worksheet, filas: number) {
 }
 
 export class HorasExtrasService {
-  async generarExcel(registros: RegistroAsistencia[]): Promise<any> {
-    const filas: FilaReporte[] = registros
+  async generarExcel(registros: RegistroAsistencia[], empresa?: string): Promise<any> {
+    let registrosFiltrados = registros;
+    if (empresa) {
+      registrosFiltrados = registros.filter((r: any) => {
+        const persona: Persona | undefined = r.persona;
+        return persona?.empresa === empresa;
+      });
+    }
+
+    const filas: FilaReporte[] = registrosFiltrados
       .map((registro: any) => {
         const persona: Persona | undefined = registro.persona;
         const cargo: Cargo | undefined = registro.cargo;
@@ -351,7 +378,7 @@ export class HorasExtrasService {
     worksheet.getCell("A5").value = "PERIODO:";
     worksheet.getCell("C5").value = periodo;
     worksheet.getCell("E5").value = "COMPAÑÍA";
-    worksheet.getCell("G5").value = textoCompania();
+    worksheet.getCell("G5").value = textoCompania(empresa);
 
     worksheet.getCell("A5").font = fuenteTitulo;
     worksheet.getCell("C5").font = fuenteTitulo;

@@ -10,12 +10,14 @@
     "db:sync": "ts-node src/scripts/syncDatabase.ts"
   },
   "dependencies": {
+    "@types/nodemailer": "^8.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "exceljs": "^4.4.0",
     "express": "^4.19.2",
     "mysql2": "^3.11.0",
     "mysql8": "^2.17.3",
+    "nodemailer": "^9.0.5",
     "sequelize": "^6.37.8"
   },
   "devDependencies": {

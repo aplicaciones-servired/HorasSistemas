@@ -1,18 +1,33 @@
 import { Request, Response } from 'express';
 import { FechaCorte, RegistroAsistencia, Persona, Cargo } from '../models';
 import { HorasExtrasService } from '../services/horasExtrasService';
+import { sendExcelEmail } from '../services/emailService';
 
 const horasExtrasService = new HorasExtrasService();
 
-export const listFechasCorte = async (_req: Request, res: Response): Promise<void> => {
+export const listFechasCorte = async (req: Request, res: Response): Promise<void> => {
+  const empresa = req.query.empresa as string | undefined;
+
+  const includeOptions: any[] = [
+    {
+      model: RegistroAsistencia,
+      as: 'registros',
+      attributes: ['id'],
+      ...(empresa ? {
+        required: true,
+        include: [{
+          model: Persona,
+          as: 'persona',
+          attributes: ['id'],
+          required: true,
+          where: { empresa }
+        }]
+      } : {})
+    }
+  ];
+
   const fechas = await FechaCorte.findAll({
-    include: [
-      {
-        model: RegistroAsistencia,
-        as: 'registros',
-        attributes: ['id']
-      }
-    ],
+    include: includeOptions,
     order: [['createdAt', 'DESC']]
   });
 
@@ -117,6 +132,7 @@ export const deleteFechaCorte = async (req: Request, res: Response): Promise<voi
 
 export const finalizarFechaCorte = async (req: Request, res: Response): Promise<void> => {
   const id = String(req.params.id);
+  const empresa = req.query.empresa as string | undefined;
   const fecha = await FechaCorte.findByPk(id);
 
   if (!fecha) {
@@ -142,9 +158,28 @@ export const finalizarFechaCorte = async (req: Request, res: Response): Promise<
     await fecha.save();
   }
 
-  const buffer = await horasExtrasService.generarExcel(registros);
+  const buffer = await horasExtrasService.generarExcel(registros, empresa);
 
-  const filename = `Novedades_nomina_jamundi_${fecha.fechaInicio}_${fecha.fechaFin}.xlsx`;
+  const empresaLabel = empresa ? `_${empresa}` : '';
+  const filename = `Novedades_nomina_jamundi${empresaLabel}_${fecha.fechaInicio}_${fecha.fechaFin}.xlsx`;
+
+  if (empresa) {
+    const registrosFiltrados = registros.filter((r: any) => r.persona?.empresa === empresa);
+    const fechas = registrosFiltrados.map((r: any) => new Date(`${r.fecha}T12:00:00`));
+    let periodo = `${fecha.fechaInicio} al ${fecha.fechaFin}`;
+    if (fechas.length > 0) {
+      const min = new Date(Math.min(...fechas.map((d: Date) => d.getTime())));
+      const max = new Date(Math.max(...fechas.map((d: Date) => d.getTime())));
+      const fmt = (d: Date) => `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+      periodo = `${fmt(min)} al ${fmt(max)}`;
+    }
+    sendExcelEmail({
+      empresa: empresa as 'Servired' | 'Multired',
+      filename,
+      buffer: Buffer.from(buffer),
+      periodo
+    }).catch((err) => console.error('Error enviando correo en background:', err));
+  }
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

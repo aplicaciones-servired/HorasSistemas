@@ -6,7 +6,6 @@ export const reporteService = {
       responseType: 'blob'
     });
     
-    // Crear un URL para descargar el archivo
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -25,7 +24,6 @@ export const reporteService = {
       responseType: 'blob'
     });
     
-    // Crear un URL para descargar el archivo
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -39,26 +37,35 @@ export const reporteService = {
     window.URL.revokeObjectURL(url);
   },
 
-  async descargarHorasExtras(fechaCorteId?: number) {
+  async descargarHorasExtras(fechaCorteId?: number, empresa?: string) {
     const params: any = {};
     if (fechaCorteId) params.fechaCorteId = fechaCorteId;
+    if (empresa) params.empresa = empresa;
     const response = await api.get('/horas-extras/descargar', {
       responseType: 'blob',
       params
     });
 
-    // Crear un URL para descargar el archivo
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
 
     const fecha = new Date().toISOString().split('T')[0];
-    link.setAttribute('download', `horas_extras_${fecha}.xlsx`);
+    const empresaLabel = empresa ? `_${empresa}` : '';
+    link.setAttribute('download', `horas_extras${empresaLabel}_${fecha}.xlsx`);
 
     document.body.appendChild(link);
     link.click();
     link.parentNode?.removeChild(link);
     window.URL.revokeObjectURL(url);
+  },
+
+  async enviarHorasExtrasEmail(fechaCorteId: number | null, empresa: string) {
+    const response = await api.post('/horas-extras/enviar-email', {
+      fechaCorteId: fechaCorteId || null,
+      empresa
+    });
+    return response.data;
   }
 };
 

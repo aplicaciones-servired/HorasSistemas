@@ -8,8 +8,10 @@ export interface FechaCortePayload {
 }
 
 export const fechaCorteService = {
-  async list(): Promise<FechaCorte[]> {
-    const response = await api.get<FechaCorte[]>('/fechas-corte');
+  async list(empresa?: string): Promise<FechaCorte[]> {
+    const params: any = {};
+    if (empresa) params.empresa = empresa;
+    const response = await api.get<FechaCorte[]>('/fechas-corte', { params });
     return response.data;
   },
 
@@ -32,9 +34,12 @@ export const fechaCorteService = {
     await api.delete(`/fechas-corte/${id}`);
   },
 
-  async finalizar(id: number): Promise<Blob> {
+  async finalizar(id: number, empresa?: string): Promise<Blob> {
+    const params: any = {};
+    if (empresa) params.empresa = empresa;
     const response = await api.post(`/fechas-corte/${id}/finalizar`, null, {
-      responseType: 'blob'
+      responseType: 'blob',
+      params
     });
     return response.data;
   },

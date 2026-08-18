@@ -5,16 +5,37 @@ import { FechaCorteSelector } from '../components/fechasCorte/FechaCorteSelector
 import { useDashboard } from '../hooks/useDashboard';
 import { StatusToaster } from '../components/toast/StatusToaster';
 import { reporteService } from '../services/reporteService';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 export const NovedadesPage = () => {
   const dashboard = useDashboard();
   const [descargando, setDescargando] = useState(false);
 
+  const personasFiltradas = useMemo(() => {
+    if (!dashboard.empresaFilter) return dashboard.personas;
+    return dashboard.personas.filter((p) => p.empresa === dashboard.empresaFilter);
+  }, [dashboard.personas, dashboard.empresaFilter]);
+
   const handleDescargarHorasExtras = async () => {
     try {
       setDescargando(true);
-      await reporteService.descargarHorasExtras(dashboard.selectedFechaCorteId ?? undefined);
+      await reporteService.descargarHorasExtras(
+        dashboard.selectedFechaCorteId ?? undefined,
+        dashboard.empresaFilter || undefined
+      );
+      if (dashboard.empresaFilter) {
+        try {
+          await reporteService.enviarHorasExtrasEmail(
+            dashboard.selectedFechaCorteId ?? null,
+            dashboard.empresaFilter
+          );
+          dashboard.setStatus({ type: 'success', message: `Excel descargado y correo enviado a destinatarios de ${dashboard.empresaFilter}.` });
+        } catch {
+          dashboard.setStatus({ type: 'error', message: 'El Excel se descargó pero falló el envío del correo.' });
+        }
+      } else {
+        dashboard.setStatus({ type: 'success', message: 'Excel descargado correctamente.' });
+      }
     } catch (error) {
       console.error('Error descargando horas extras:', error);
     } finally {
@@ -32,6 +53,30 @@ export const NovedadesPage = () => {
 
       <StatusToaster status={dashboard.status} />
 
+      <section className="panel panel--main">
+        <div className="panel-header">
+          <div>
+            <span className="section-label">Filtro de empresa</span>
+            <h2>Seleccionar empresa</h2>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'end', flexWrap: 'wrap' }}>
+          <label style={{ flex: 1, minWidth: '200px' }}>
+            Empresa
+            <select value={dashboard.empresaFilter} onChange={(e) => dashboard.setEmpresaFilter(e.target.value)}>
+              <option value="">Todas las empresas</option>
+              <option value="Servired">Servired</option>
+              <option value="Multired">Multired</option>
+            </select>
+          </label>
+          {dashboard.empresaFilter && (
+            <span style={{ fontSize: '0.8rem', opacity: 0.6, alignSelf: 'end', marginBottom: '2px' }}>
+              {personasFiltradas.length} personas de {dashboard.empresaFilter}
+            </span>
+          )}
+        </div>
+      </section>
+
       <section className="workspace-grid workspace-grid--single">
         <FechaCorteSelector
           fechasCorte={dashboard.fechasCorte}
@@ -41,7 +86,7 @@ export const NovedadesPage = () => {
           onSelect={dashboard.setSelectedFechaCorteId}
           onCreate={dashboard.handleCreateFechaCorte}
           onDelete={dashboard.handleDeleteFechaCorte}
-          onFinalizar={dashboard.handleFinalizarFechaCorte}
+          onFinalizar={(id) => dashboard.handleFinalizarFechaCorte(id, dashboard.empresaFilter || undefined)}
         />
       </section>
 
@@ -50,7 +95,7 @@ export const NovedadesPage = () => {
           <RegistroForm
             values={dashboard.registroForm}
             cargos={dashboard.cargos}
-            personas={dashboard.personas}
+            personas={personasFiltradas}
             turnos={dashboard.turnos}
             personaEncontrada={dashboard.foundPersona}
             lookupState={dashboard.lookupState}

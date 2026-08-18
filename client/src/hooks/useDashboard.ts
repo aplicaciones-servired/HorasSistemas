@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { createCargo, listCargos } from '../services/cargoService';
 import { getApiErrorMessage } from '../services/api';
+import { reporteService } from '../services/reporteService';
 import { fechaCorteService, type FechaCortePayload } from '../services/fechaCorteService';
 import {
   createPersona,
@@ -82,6 +83,7 @@ export const useDashboard = () => {
   const [selectedFechaCorteId, setSelectedFechaCorteId] = useState<number | null>(null);
   const [registrosFechaCorte, setRegistrosFechaCorte] = useState<RegistroAsistencia[]>([]);
   const [isSavingFechaCorte, setIsSavingFechaCorte] = useState(false);
+  const [empresaFilter, setEmpresaFilter] = useState<string>('');
 
   const selectedFechaCorte = fechasCorte.find((f) => f.id === selectedFechaCorteId) ?? null;
 
@@ -89,7 +91,7 @@ export const useDashboard = () => {
     setStatus((current) => (current.type === 'success' ? current : { type: 'idle', message: '' }));
   };
 
-  const refreshData = async (): Promise<void> => {
+  const refreshData = async (empresa?: string): Promise<void> => {
     setIsLoading(true);
     try {
       const [nextCargos, nextPersonas, nextRegistros, nextTurnos, nextFechasCorte] = await Promise.all([
@@ -97,7 +99,7 @@ export const useDashboard = () => {
         listPersonas(),
         listRegistros(),
         listTurnos(),
-        fechaCorteService.list()
+        fechaCorteService.list(empresa)
       ]);
 
       setCargos(nextCargos);
@@ -114,8 +116,8 @@ export const useDashboard = () => {
   };
 
   useEffect(() => {
-    void refreshData();
-  }, []);
+    void refreshData(empresaFilter || undefined);
+  }, [empresaFilter]);
 
   const refreshRegistrosFechaCorte = async (): Promise<void> => {
     if (!selectedFechaCorteId) {
@@ -167,30 +169,40 @@ export const useDashboard = () => {
     }
   };
 
-  const handleFinalizarFechaCorte = async (id: number): Promise<void> => {
+  const handleFinalizarFechaCorte = async (id: number, empresa?: string): Promise<void> => {
     const fc = fechasCorte.find((f) => f.id === id);
     const mensaje = fc?.completada
-      ? '¿Regenerar el Excel para esta fecha de corte?'
-      : '¿Finalizar esta fecha de corte? Se generará el archivo Excel.';
+      ? `¿Regenerar el Excel para esta fecha de corte${empresa ? ` (${empresa})` : ''}?`
+      : `¿Finalizar esta fecha de corte${empresa ? ` (${empresa})` : ''}? Se generará el archivo Excel.`;
     const confirmado = await confirm(mensaje);
     if (!confirmado) return;
 
     setIsSavingFechaCorte(true);
     try {
-      const blob = await fechaCorteService.finalizar(id);
+      const blob = await fechaCorteService.finalizar(id, empresa);
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
       link.href = url;
       const fc = fechasCorte.find((f) => f.id === id);
+      const empresaLabel = empresa ? `_${empresa}` : '';
       const filename = fc
-        ? `Novedades_nomina_jamundi_${fc.fechaInicio}_${fc.fechaFin}.xlsx`
-        : `Novedades_nomina_jamundi.xlsx`;
+        ? `Novedades_nomina_jamundi${empresaLabel}_${fc.fechaInicio}_${fc.fechaFin}.xlsx`
+        : `Novedades_nomina_jamundi${empresaLabel}.xlsx`;
       link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(url);
-      setStatus({ type: 'success', message: 'Fecha de corte finalizada y Excel descargado.' });
+      if (empresa) {
+        try {
+          await reporteService.enviarHorasExtrasEmail(id, empresa);
+          setStatus({ type: 'success', message: `Excel descargado y correo enviado a destinatarios de ${empresa}.` });
+        } catch {
+          setStatus({ type: 'error', message: 'El Excel se descargó pero falló el envío del correo.' });
+        }
+      } else {
+        setStatus({ type: 'success', message: 'Fecha de corte finalizada y Excel descargado.' });
+      }
       await refreshData();
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo finalizar la fecha de corte') });
@@ -632,6 +644,9 @@ export const useDashboard = () => {
     selectedFechaCorteId,
     registrosFechaCorte,
     isSavingFechaCorte,
+    empresaFilter,
+    setEmpresaFilter,
+    setStatus,
     updateRegistroField,
     updateCargoField,
     updatePersonaField,
