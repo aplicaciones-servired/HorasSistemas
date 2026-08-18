@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { createCargo, listCargos } from '../services/cargoService';
 import { getApiErrorMessage } from '../services/api';
+import { fechaCorteService, type FechaCortePayload } from '../services/fechaCorteService';
 import {
   createPersona,
   deletePersona,
@@ -11,9 +12,12 @@ import {
 } from '../services/personaService';
 import { createRegistro, deleteRegistro, listRegistros, updateRegistro, type RegistroPayload } from '../services/registroService';
 import { listTurnos } from '../services/turnoService';
+import { useConfirm } from '../components/toast/useConfirm';
 import type {
   Cargo,
   CargoFormValues,
+  FechaCorte,
+  FechaCorteFormValues,
   LookupState,
   Persona,
   PersonaFormValues,
@@ -54,6 +58,7 @@ const initialPersonaForm: PersonaFormValues = {
 };
 
 export const useDashboard = () => {
+  const { confirm } = useConfirm();
   const [cargos, setCargos] = useState<Cargo[]>([]);
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [registros, setRegistros] = useState<RegistroAsistencia[]>([]);
@@ -73,6 +78,13 @@ export const useDashboard = () => {
   const [isSavingPersona, setIsSavingPersona] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
+  const [fechasCorte, setFechasCorte] = useState<FechaCorte[]>([]);
+  const [selectedFechaCorteId, setSelectedFechaCorteId] = useState<number | null>(null);
+  const [registrosFechaCorte, setRegistrosFechaCorte] = useState<RegistroAsistencia[]>([]);
+  const [isSavingFechaCorte, setIsSavingFechaCorte] = useState(false);
+
+  const selectedFechaCorte = fechasCorte.find((f) => f.id === selectedFechaCorteId) ?? null;
+
   const clearTransientStatus = (): void => {
     setStatus((current) => (current.type === 'success' ? current : { type: 'idle', message: '' }));
   };
@@ -80,17 +92,19 @@ export const useDashboard = () => {
   const refreshData = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      const [nextCargos, nextPersonas, nextRegistros, nextTurnos] = await Promise.all([
+      const [nextCargos, nextPersonas, nextRegistros, nextTurnos, nextFechasCorte] = await Promise.all([
         listCargos(),
         listPersonas(),
         listRegistros(),
-        listTurnos()
+        listTurnos(),
+        fechaCorteService.list()
       ]);
 
       setCargos(nextCargos);
       setPersonas(nextPersonas);
       setRegistros(nextRegistros);
       setTurnos(nextTurnos);
+      setFechasCorte(nextFechasCorte);
       setLastRefresh(new Date());
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo cargar la información inicial') });
@@ -102,6 +116,133 @@ export const useDashboard = () => {
   useEffect(() => {
     void refreshData();
   }, []);
+
+  const refreshRegistrosFechaCorte = async (): Promise<void> => {
+    if (!selectedFechaCorteId) {
+      setRegistrosFechaCorte([]);
+      return;
+    }
+    try {
+      const regs = await fechaCorteService.listRegistros(selectedFechaCorteId);
+      setRegistrosFechaCorte(regs);
+    } catch (error) {
+      setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudieron cargar los registros de la fecha de corte') });
+    }
+  };
+
+  useEffect(() => {
+    void refreshRegistrosFechaCorte();
+  }, [selectedFechaCorteId]);
+
+  const handleCreateFechaCorte = async (values: FechaCorteFormValues): Promise<void> => {
+    setIsSavingFechaCorte(true);
+    try {
+      await fechaCorteService.create(values);
+      setStatus({ type: 'success', message: 'Fecha de corte creada correctamente.' });
+      await refreshData();
+    } catch (error) {
+      setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo crear la fecha de corte') });
+    } finally {
+      setIsSavingFechaCorte(false);
+    }
+  };
+
+  const handleDeleteFechaCorte = async (id: number): Promise<void> => {
+    const confirmado = await confirm('¿Eliminar esta fecha de corte?');
+    if (!confirmado) return;
+
+    setIsSavingFechaCorte(true);
+    try {
+      await fechaCorteService.remove(id);
+      if (selectedFechaCorteId === id) {
+        setSelectedFechaCorteId(null);
+        setRegistrosFechaCorte([]);
+      }
+      setStatus({ type: 'success', message: 'Fecha de corte eliminada correctamente.' });
+      await refreshData();
+    } catch (error) {
+      setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo eliminar la fecha de corte') });
+    } finally {
+      setIsSavingFechaCorte(false);
+    }
+  };
+
+  const handleFinalizarFechaCorte = async (id: number): Promise<void> => {
+    const fc = fechasCorte.find((f) => f.id === id);
+    const mensaje = fc?.completada
+      ? '¿Regenerar el Excel para esta fecha de corte?'
+      : '¿Finalizar esta fecha de corte? Se generará el archivo Excel.';
+    const confirmado = await confirm(mensaje);
+    if (!confirmado) return;
+
+    setIsSavingFechaCorte(true);
+    try {
+      const blob = await fechaCorteService.finalizar(id);
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      const fc = fechasCorte.find((f) => f.id === id);
+      const filename = fc
+        ? `Novedades_nomina_jamundi_${fc.fechaInicio}_${fc.fechaFin}.xlsx`
+        : `Novedades_nomina_jamundi.xlsx`;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      setStatus({ type: 'success', message: 'Fecha de corte finalizada y Excel descargado.' });
+      await refreshData();
+    } catch (error) {
+      setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo finalizar la fecha de corte') });
+    } finally {
+      setIsSavingFechaCorte(false);
+    }
+  };
+
+  const handleGuardarRegistroGrid = async (
+    personaId: number,
+    fecha: string,
+    horaEntrada: string,
+    horaSalida: string,
+    esDominical: boolean,
+    existingRegistroId?: number
+  ): Promise<void> => {
+    if (!selectedFechaCorteId) return;
+    setIsSavingFechaCorte(true);
+    try {
+      const persona = personas.find((p) => p.id === personaId);
+      const cargoId = persona?.cargoId ?? null;
+
+      if (existingRegistroId) {
+        await updateRegistro(existingRegistroId, {
+          personaId,
+          cargoId,
+          fechaCorteId: selectedFechaCorteId,
+          fecha,
+          horaEntrada,
+          horaSalida,
+          observacion: null,
+          esDominical
+        });
+      } else {
+        await createRegistro({
+          personaId,
+          cargoId,
+          fechaCorteId: selectedFechaCorteId,
+          fecha,
+          horaEntrada,
+          horaSalida,
+          observacion: null,
+          esDominical
+        });
+      }
+      await refreshRegistrosFechaCorte();
+    } catch (error) {
+      setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo guardar el registro') });
+    } finally {
+      setIsSavingFechaCorte(false);
+    }
+  };
 
   const updateRegistroField = <K extends keyof RegistroFormValues>(field: K, value: RegistroFormValues[K]): void => {
     clearTransientStatus();
@@ -261,6 +402,7 @@ export const useDashboard = () => {
   const buildRegistroPayload = (personaId: number, values: RegistroFormValues): RegistroPayload => ({
     personaId,
     cargoId: values.cargoId ? Number(values.cargoId) : null,
+    fechaCorteId: selectedFechaCorteId,
     fecha: values.fecha,
     horaEntrada: values.horaEntrada,
     horaSalida: values.horaSalida,
@@ -346,6 +488,9 @@ export const useDashboard = () => {
       }
 
       await refreshData();
+      if (selectedFechaCorteId) {
+        await refreshRegistrosFechaCorte();
+      }
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo guardar el registro') });
     } finally {
@@ -357,7 +502,7 @@ export const useDashboard = () => {
     const nombre = registro.persona
       ? `${registro.persona.nombres} ${registro.persona.apellidos}`.trim()
       : `#${registro.id}`;
-    const confirmado = window.confirm(`¿Eliminar la novedad de ${nombre} del ${registro.fecha}?`);
+    const confirmado = await confirm(`¿Eliminar la novedad de ${nombre} del ${registro.fecha}?`);
 
     if (!confirmado) return;
 
@@ -367,6 +512,9 @@ export const useDashboard = () => {
       await deleteRegistro(registro.id);
       setStatus({ type: 'success', message: 'Registro eliminado correctamente.' });
       await refreshData();
+      if (selectedFechaCorteId) {
+        await refreshRegistrosFechaCorte();
+      }
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo eliminar el registro') });
     } finally {
@@ -376,7 +524,7 @@ export const useDashboard = () => {
 
   const handleEliminarPersona = async (persona: Persona): Promise<void> => {
     const nombre = `${persona.nombres} ${persona.apellidos}`.trim();
-    const confirmado = window.confirm(
+    const confirmado = await confirm(
       `¿Eliminar al usuario ${nombre} (cédula ${persona.cedula})?\n\nEsto eliminará también todos sus registros de asistencia.`
     );
 
@@ -479,6 +627,11 @@ export const useDashboard = () => {
     isSavingCargo,
     isSavingPersona,
     summary,
+    fechasCorte,
+    selectedFechaCorte,
+    selectedFechaCorteId,
+    registrosFechaCorte,
+    isSavingFechaCorte,
     updateRegistroField,
     updateCargoField,
     updatePersonaField,
@@ -493,6 +646,11 @@ export const useDashboard = () => {
     loadRegistroForEdit,
     resetPersonaForm,
     resetRegistroForm,
-    refreshData
+    refreshData,
+    setSelectedFechaCorteId,
+    handleCreateFechaCorte,
+    handleDeleteFechaCorte,
+    handleFinalizarFechaCorte,
+    handleGuardarRegistroGrid
   };
 };

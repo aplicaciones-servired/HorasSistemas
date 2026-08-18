@@ -2,11 +2,13 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../config/database';
 import { Cargo } from './Cargo';
 import { Persona } from './Persona';
+import { FechaCorte } from './FechaCorte';
 
 export interface RegistroAsistenciaAttributes {
   id: number;
   personaId: number;
   cargoId: number | null;
+  fechaCorteId: number | null;
   fecha: string;
   horaEntrada: string;
   horaSalida: string;
@@ -16,12 +18,13 @@ export interface RegistroAsistenciaAttributes {
   updatedAt?: Date;
 }
 
-export type RegistroAsistenciaCreationAttributes = Optional<RegistroAsistenciaAttributes, 'id' | 'cargoId' | 'observacion' | 'esDominical'>;
+export type RegistroAsistenciaCreationAttributes = Optional<RegistroAsistenciaAttributes, 'id' | 'cargoId' | 'fechaCorteId' | 'observacion' | 'esDominical'>;
 
 export class RegistroAsistencia extends Model<RegistroAsistenciaAttributes, RegistroAsistenciaCreationAttributes> implements RegistroAsistenciaAttributes {
   declare id: number;
   declare personaId: number;
   declare cargoId: number | null;
+  declare fechaCorteId: number | null;
   declare fecha: string;
   declare horaEntrada: string;
   declare horaSalida: string;
@@ -51,6 +54,14 @@ RegistroAsistencia.init(
       allowNull: true,
       references: {
         model: Cargo,
+        key: 'id'
+      }
+    },
+    fechaCorteId: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true,
+      references: {
+        model: FechaCorte,
         key: 'id'
       }
     },

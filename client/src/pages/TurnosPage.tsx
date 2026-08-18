@@ -3,6 +3,7 @@ import { DashboardHeader } from '../components/layout/DashboardHeader';
 import { TurnoForm } from '../components/forms/TurnoForm';
 import { TurnosTable } from '../components/tables/TurnosTable';
 import { StatusToaster } from '../components/toast/StatusToaster';
+import { useConfirm } from '../components/toast/useConfirm';
 import { listTurnos, createTurno, updateTurno, deleteTurno } from '../services/turnoService';
 import { getApiErrorMessage } from '../services/api';
 import type { Turno, TurnoFormValues, StatusType } from '../types/domain';
@@ -15,6 +16,7 @@ const initialForm: TurnoFormValues = {
 };
 
 export const TurnosPage = () => {
+  const { confirm } = useConfirm();
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [form, setForm] = useState<TurnoFormValues>(initialForm);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -81,7 +83,7 @@ export const TurnosPage = () => {
   };
 
   const handleDelete = async (turno: Turno) => {
-    const confirmado = window.confirm(`¿Eliminar el turno "${turno.nombre}"?`);
+    const confirmado = await confirm(`¿Eliminar el turno "${turno.nombre}"?`);
     if (!confirmado) return;
 
     try {

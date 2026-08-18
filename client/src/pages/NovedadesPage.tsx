@@ -1,6 +1,7 @@
 import { RegistroForm } from '../components/forms/RegistroForm';
 import { DashboardHeader } from '../components/layout/DashboardHeader';
 import { RegistrosTable } from '../components/tables/RegistrosTable';
+import { FechaCorteSelector } from '../components/fechasCorte/FechaCorteSelector';
 import { useDashboard } from '../hooks/useDashboard';
 import { StatusToaster } from '../components/toast/StatusToaster';
 import { reporteService } from '../services/reporteService';
@@ -10,32 +11,10 @@ export const NovedadesPage = () => {
   const dashboard = useDashboard();
   const [descargando, setDescargando] = useState(false);
 
-  // const handleDescargarExcel = async () => {
-  //   try {
-  //     setDescargando(true);
-  //     await reporteService.descargarAsistencia();
-  //   } catch (error) {
-  //     console.error('Error descargando Excel:', error);
-  //   } finally {
-  //     setDescargando(false);
-  //   }
-  // };
-
-  // const handleDescargarNomina = async () => {
-  //   try {
-  //     setDescargando(true);
-  //     await reporteService.descargarNomina();
-  //   } catch (error) {
-  //     console.error('Error descargando nómina:', error);
-  //   } finally {
-  //     setDescargando(false);
-  //   }
-  // };
-
   const handleDescargarHorasExtras = async () => {
     try {
       setDescargando(true);
-      await reporteService.descargarHorasExtras();
+      await reporteService.descargarHorasExtras(dashboard.selectedFechaCorteId ?? undefined);
     } catch (error) {
       console.error('Error descargando horas extras:', error);
     } finally {
@@ -54,56 +33,59 @@ export const NovedadesPage = () => {
       <StatusToaster status={dashboard.status} />
 
       <section className="workspace-grid workspace-grid--single">
-        <RegistroForm
-          values={dashboard.registroForm}
-          cargos={dashboard.cargos}
-          personas={dashboard.personas}
-          turnos={dashboard.turnos}
-          personaEncontrada={dashboard.foundPersona}
-          lookupState={dashboard.lookupState}
-          isSaving={dashboard.isSavingRegistro}
-          isEditing={!!dashboard.editingRegistroId}
-          onChange={dashboard.updateRegistroField}
-          onBuscarCedula={dashboard.handleBuscarCedula}
-          onSelectPersona={dashboard.handleSelectPersona}
-          onReset={dashboard.resetRegistroForm}
-          onSubmit={dashboard.handleGuardarRegistro}
-          onDeletePersona={dashboard.handleEliminarPersona}
+        <FechaCorteSelector
+          fechasCorte={dashboard.fechasCorte}
+          selectedId={dashboard.selectedFechaCorteId}
+          isLoading={dashboard.isLoading}
+          isSaving={dashboard.isSavingFechaCorte}
+          onSelect={dashboard.setSelectedFechaCorteId}
+          onCreate={dashboard.handleCreateFechaCorte}
+          onDelete={dashboard.handleDeleteFechaCorte}
+          onFinalizar={dashboard.handleFinalizarFechaCorte}
         />
       </section>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', marginBottom: '10px', gap: '12px' }}>
-        {/* <button
-          type="button"
-          className="ghost-button"
-          onClick={handleDescargarExcel}
-          disabled={descargando || dashboard.registros.length === 0}
-        >
-          {descargando ? 'Descargando...' : '📋 Asistencia'}
-        </button> */}
-        <button
-          type="button"
-          className="primary-button"
-          onClick={handleDescargarHorasExtras}
-          disabled={descargando || dashboard.registros.length === 0}
-        >
-          {descargando ? 'Descargando...' : '⏰ Horas Extras'}
-        </button>
-        {/* <button
-          type="button"
-          className="primary-button"
-          onClick={handleDescargarNomina}
-          disabled={descargando || dashboard.registros.length === 0}
-        >
-          {descargando ? 'Descargando...' : '💰 Nómina'}
-        </button> */}
-      </div>
+      {dashboard.selectedFechaCorte && (
+        <section className="workspace-grid workspace-grid--single">
+          <RegistroForm
+            values={dashboard.registroForm}
+            cargos={dashboard.cargos}
+            personas={dashboard.personas}
+            turnos={dashboard.turnos}
+            personaEncontrada={dashboard.foundPersona}
+            lookupState={dashboard.lookupState}
+            isSaving={dashboard.isSavingRegistro}
+            isEditing={!!dashboard.editingRegistroId}
+            onChange={dashboard.updateRegistroField}
+            onBuscarCedula={dashboard.handleBuscarCedula}
+            onSelectPersona={dashboard.handleSelectPersona}
+            onReset={dashboard.resetRegistroForm}
+            onSubmit={dashboard.handleGuardarRegistro}
+            onDeletePersona={dashboard.handleEliminarPersona}
+          />
+        </section>
+      )}
 
-      <RegistrosTable
-        registros={dashboard.registros}
-        onEdit={dashboard.loadRegistroForEdit}
-        onDelete={dashboard.handleEliminarRegistro}
-      />
+      {dashboard.selectedFechaCorteId && (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', marginBottom: '10px', gap: '12px' }}>
+            <button
+              type="button"
+              className="primary-button"
+              onClick={handleDescargarHorasExtras}
+              disabled={descargando || dashboard.registrosFechaCorte.length === 0}
+            >
+              {descargando ? 'Descargando...' : '⏰ Horas Extras'}
+            </button>
+          </div>
+
+          <RegistrosTable
+            registros={dashboard.registrosFechaCorte}
+            onEdit={dashboard.loadRegistroForEdit}
+            onDelete={dashboard.handleEliminarRegistro}
+          />
+        </>
+      )}
 
       {dashboard.isLoading ? <div className="loading-banner">Cargando datos iniciales...</div> : null}
     </>

@@ -39,9 +39,12 @@ export const reporteService = {
     window.URL.revokeObjectURL(url);
   },
 
-  async descargarHorasExtras() {
+  async descargarHorasExtras(fechaCorteId?: number) {
+    const params: any = {};
+    if (fechaCorteId) params.fechaCorteId = fechaCorteId;
     const response = await api.get('/horas-extras/descargar', {
-      responseType: 'blob'
+      responseType: 'blob',
+      params
     });
 
     // Crear un URL para descargar el archivo

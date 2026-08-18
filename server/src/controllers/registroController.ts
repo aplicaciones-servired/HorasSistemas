@@ -1,8 +1,16 @@
 import { Request, Response } from 'express';
 import { Cargo, Persona, RegistroAsistencia } from '../models';
 
-export const listRegistros = async (_request: Request, response: Response): Promise<void> => {
+export const listRegistros = async (request: Request, response: Response): Promise<void> => {
+  const where: any = {};
+  const fechaCorteId = request.query.fechaCorteId;
+
+  if (fechaCorteId) {
+    where.fechaCorteId = Number(fechaCorteId);
+  }
+
   const registros = await RegistroAsistencia.findAll({
+    where,
     include: [
       { model: Persona, as: 'persona' },
       { model: Cargo, as: 'cargo' }
@@ -14,9 +22,10 @@ export const listRegistros = async (_request: Request, response: Response): Prom
 };
 
 export const createRegistro = async (request: Request, response: Response): Promise<void> => {
-  const { personaId, cargoId, fecha, horaEntrada, horaSalida, observacion, esDominical } = request.body as {
+  const { personaId, cargoId, fechaCorteId, fecha, horaEntrada, horaSalida, observacion, esDominical } = request.body as {
     personaId?: number;
     cargoId?: number | null;
+    fechaCorteId?: number | null;
     fecha?: string;
     horaEntrada?: string;
     horaSalida?: string;
@@ -37,6 +46,7 @@ export const createRegistro = async (request: Request, response: Response): Prom
   const registro = await RegistroAsistencia.create({
     personaId,
     cargoId: cargoId ?? null,
+    fechaCorteId: fechaCorteId ?? null,
     fecha,
     horaEntrada,
     horaSalida,
@@ -56,9 +66,10 @@ export const updateRegistro = async (request: Request, response: Response): Prom
     return;
   }
 
-  const { personaId, cargoId, fecha, horaEntrada, horaSalida, observacion, esDominical } = request.body as {
+  const { personaId, cargoId, fechaCorteId, fecha, horaEntrada, horaSalida, observacion, esDominical } = request.body as {
     personaId?: number;
     cargoId?: number | null;
+    fechaCorteId?: number | null;
     fecha?: string;
     horaEntrada?: string;
     horaSalida?: string;
@@ -68,6 +79,7 @@ export const updateRegistro = async (request: Request, response: Response): Prom
 
   if (personaId !== undefined) registro.personaId = personaId;
   if (cargoId !== undefined) registro.cargoId = cargoId;
+  if (fechaCorteId !== undefined) registro.fechaCorteId = fechaCorteId;
   if (fecha !== undefined) registro.fecha = fecha;
   if (horaEntrada !== undefined) registro.horaEntrada = horaEntrada;
   if (horaSalida !== undefined) registro.horaSalida = horaSalida;

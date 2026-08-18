@@ -44,10 +44,22 @@ CREATE TABLE IF NOT EXISTS turnos (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE IF NOT EXISTS fechas_corte (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  fechaInicio DATE NOT NULL,
+  fechaFin DATE NOT NULL,
+  descripcion VARCHAR(255) NULL,
+  completada TINYINT(1) NOT NULL DEFAULT 0,
+  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TIMESTAMP NULL,
+  PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS registros_asistencia (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   personaId BIGINT UNSIGNED NOT NULL,
   cargoId BIGINT UNSIGNED NULL,
+  fechaCorteId BIGINT UNSIGNED NULL,
   fecha DATE NOT NULL,
   horaEntrada TIME NOT NULL,
   horaSalida TIME NOT NULL,
@@ -58,12 +70,17 @@ CREATE TABLE IF NOT EXISTS registros_asistencia (
   UNIQUE KEY uk_registros_persona_fecha (personaId, fecha),
   KEY idx_registros_cargoId (cargoId),
   KEY idx_registros_fecha (fecha),
+  KEY idx_registros_fechaCorteId (fechaCorteId),
   CONSTRAINT fk_registros_personas
     FOREIGN KEY (personaId) REFERENCES personas (id)
     ON UPDATE CASCADE
     ON DELETE CASCADE,
   CONSTRAINT fk_registros_cargos
     FOREIGN KEY (cargoId) REFERENCES cargos (id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL,
+  CONSTRAINT fk_registros_fechas_corte
+    FOREIGN KEY (fechaCorteId) REFERENCES fechas_corte (id)
     ON UPDATE CASCADE
     ON DELETE SET NULL
 );

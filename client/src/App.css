@@ -711,6 +711,51 @@ th {
   }
 }
 
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fade-in 0.15s ease;
+}
+
+.confirm-dialog {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px;
+  max-width: min(400px, calc(100vw - 48px));
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+  animation: dialog-in 0.2s ease;
+}
+
+.confirm-dialog__message {
+  margin: 0 0 20px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #e2e8f0;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dialog-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .button-sm {
   padding: 0.45rem 1rem;
   font-size: 0.85rem;

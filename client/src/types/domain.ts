@@ -19,6 +19,7 @@ export interface RegistroAsistencia {
   id: number;
   personaId: number;
   cargoId: number | null;
+  fechaCorteId: number | null;
   fecha: string;
   horaEntrada: string;
   horaSalida: string;
@@ -26,6 +27,7 @@ export interface RegistroAsistencia {
   esDominical: boolean;
   persona?: Persona | null;
   cargo?: Cargo | null;
+  fechaCorte?: FechaCorte | null;
 }
 
 export interface RegistroFormValues {
@@ -73,4 +75,21 @@ export interface TurnoFormValues {
   horaEntrada: string;
   horaSalida: string;
   esDominical: boolean;
+}
+
+export interface FechaCorte {
+  id: number;
+  fechaInicio: string;
+  fechaFin: string;
+  descripcion: string | null;
+  completada: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  registros?: RegistroAsistencia[];
+}
+
+export interface FechaCorteFormValues {
+  fechaInicio: string;
+  fechaFin: string;
+  descripcion: string;
 }

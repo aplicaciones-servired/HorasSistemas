@@ -7,7 +7,15 @@ const horasExtrasService = new HorasExtrasService();
 export class HorasExtrasController {
   async descargarHorasExtras(req: Request, res: Response) {
     try {
+      const where: any = {};
+      const fechaCorteId = req.query.fechaCorteId;
+
+      if (fechaCorteId) {
+        where.fechaCorteId = Number(fechaCorteId);
+      }
+
       const registros = await RegistroAsistencia.findAll({
+        where,
         include: [
           { model: Persona, as: 'persona' },
           { model: Cargo, as: 'cargo' }
@@ -21,7 +29,7 @@ export class HorasExtrasController {
       const buffer = await horasExtrasService.generarExcel(registros);
 
       const fecha = new Date().toISOString().split('T')[0];
-      const filename = `horas_extras_${fecha}.xlsx`;
+      const filename = `Novedades_nomina_ jamundi_${fecha}.xlsx`;
 
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

@@ -1,4 +1,5 @@
 import { Cargo } from './Cargo';
+import { FechaCorte } from './FechaCorte';
 import { Persona } from './Persona';
 import { RegistroAsistencia } from './RegistroAsistencia';
 import { Turno } from './Turno';
@@ -12,4 +13,7 @@ RegistroAsistencia.belongsTo(Persona, { foreignKey: 'personaId', as: 'persona' }
 Cargo.hasMany(RegistroAsistencia, { foreignKey: 'cargoId', as: 'registros' });
 RegistroAsistencia.belongsTo(Cargo, { foreignKey: 'cargoId', as: 'cargo' });
 
-export { Cargo, Persona, RegistroAsistencia, Turno };
+FechaCorte.hasMany(RegistroAsistencia, { foreignKey: 'fechaCorteId', as: 'registros' });
+RegistroAsistencia.belongsTo(FechaCorte, { foreignKey: 'fechaCorteId', as: 'fechaCorte' });
+
+export { Cargo, FechaCorte, Persona, RegistroAsistencia, Turno };
