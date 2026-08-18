@@ -3,9 +3,10 @@ import type { Persona } from '../../types/domain';
 interface PersonasTableProps {
   personas: Persona[];
   onEdit: (persona: Persona) => void;
+  onDelete: (persona: Persona) => void;
 }
 
-export const PersonasTable = ({ personas, onEdit }: PersonasTableProps) => {
+export const PersonasTable = ({ personas, onEdit, onDelete }: PersonasTableProps) => {
   return (
     <section className="panel panel--table">
       <div className="panel-header">
@@ -47,6 +48,9 @@ export const PersonasTable = ({ personas, onEdit }: PersonasTableProps) => {
                   <td>
                     <button type="button" className="button-sm ghost-button" onClick={() => onEdit(persona)}>
                       Editar
+                    </button>
+                    <button type="button" className="button-sm danger-button" onClick={() => onDelete(persona)}>
+                      Eliminar
                     </button>
                   </td>
                 </tr>

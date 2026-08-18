@@ -31,7 +31,7 @@ export const UsuariosPage = () => {
           onCancelEdit={dashboard.resetPersonaForm}
         />
 
-        <PersonasTable personas={dashboard.personas} onEdit={dashboard.loadPersonaForEdit} />
+        <PersonasTable personas={dashboard.personas} onEdit={dashboard.loadPersonaForEdit} onDelete={dashboard.handleEliminarPersona} />
       </section>
 
       {dashboard.isLoading ? <div className="loading-banner">Cargando usuarios...</div> : null}

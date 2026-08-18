@@ -650,10 +650,9 @@ export class HorasExtrasService {
     };
     worksheet.getCell(`D${filaElab + 1}`).font = fuenteValorFirma;
     worksheet.getCell(`D${filaElab + 1}`).alignment = {
-      horizontal: "left",
+      horizontal: "center",
       vertical: "top",
       wrapText: true,
-      indent: 5,
     };
 
     // Insertar logo de la empresa en el encabezado (A1:B3)

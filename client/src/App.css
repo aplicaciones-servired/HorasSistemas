@@ -378,6 +378,23 @@
   gap: 16px;
 }
 
+.stack-form-split {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: start;
+}
+
+.stack-form-split > .stack-form-fields {
+  display: grid;
+  gap: 16px;
+}
+
+.stack-form-split > .stack-form-calendar {
+  position: sticky;
+  top: 20px;
+}
+
 .form-grid {
   display: grid;
   gap: 14px;
@@ -588,6 +605,14 @@ th {
   .form-grid--two,
   .form-grid--three {
     grid-template-columns: 1fr;
+  }
+
+  .stack-form-split {
+    grid-template-columns: 1fr;
+  }
+
+  .stack-form-split > .stack-form-calendar {
+    position: static;
   }
 
   .panel-header,
