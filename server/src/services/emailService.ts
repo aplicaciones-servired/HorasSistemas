@@ -1,12 +1,22 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
+const transporterServired = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: Number(process.env.SMTP_PORT) || 587,
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
+  }
+});
+
+const transporterMultired = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: Number(process.env.SMTP_PORT) || 587,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER_MULTIRED,
+    pass: process.env.SMTP_PASS_MULTIRED
   }
 });
 
@@ -25,11 +35,12 @@ const RECIPIENTS: Record<string, string[]> = {
 export const sendExcelEmail = async (options: SendExcelEmailOptions): Promise<void> => {
   const { empresa, filename, buffer, periodo } = options;
 
-  const from = process.env.SMTP_USER;
+  const transporter = empresa === 'Multired' ? transporterMultired : transporterServired;
+  const from = empresa === 'Multired' ? process.env.SMTP_USER_MULTIRED : process.env.SMTP_USER;
   const to = RECIPIENTS[empresa];
 
   if (!from) {
-    throw new Error('No hay configurado un correo SMTP. Verifica la variable SMTP_USER en .env');
+    throw new Error(`No hay configurado un correo SMTP para ${empresa}. Verifica las variables SMTP en .env`);
   }
 
   await transporter.sendMail({

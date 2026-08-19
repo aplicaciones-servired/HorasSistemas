@@ -698,15 +698,18 @@ export class HorasExtrasService {
       });
     }
 
-    // Insertar firma de Jhon Sebastian Carvajal Colorado
+    // Insertar firma según empresa
+    const isMultired = empresa === "Multired";
+    const firmaFileName = isMultired ? "FIRMA_MULTIRED.jpeg" : "FIRMA.png";
+    const firmaExt = isMultired ? "jpeg" : "png";
     const firmaPath = path.resolve(
       __dirname,
-      "../../../client/src/assets/FIRMA.png",
+      "../../../client/src/assets/" + firmaFileName,
     );
     if (fs.existsSync(firmaPath)) {
       const firmaId = workbook.addImage({
         filename: firmaPath,
-        extension: "png",
+        extension: firmaExt,
       });
       worksheet.addImage(firmaId, {
         tl: { col: 3.5, row: filaElab - 1.5 },
@@ -714,7 +717,9 @@ export class HorasExtrasService {
       });
     }
 
-    worksheet.getCell(`D${filaElab}`).value = "Antony Hubeimar Chavez Lopez";
+    worksheet.getCell(`D${filaElab}`).value = isMultired
+      ? "Diego Giraldo Garcia"
+      : "Antony Hubeimar Chavez Lopez";
     worksheet.getCell(`D${filaElab + 1}`).value =
       "Coordinador de Telecomunicaciones";
     worksheet.getCell(`D${filaElab + 1}`).alignment = {
