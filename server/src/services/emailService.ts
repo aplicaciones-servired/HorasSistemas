@@ -20,8 +20,8 @@ interface SendExcelEmailOptions {
 }
 
 const RECIPIENTS: Record<string, string[]> = {
-  Servired: ['aplicaciones@gruposervired.com.co', 'cctvyumbo@gmail.com'],
-  Multired: ['aplicaciones@gruposervired.com.co', 'telecomunicaciones@grupomultired.com.co']
+  Servired: ['aplicaciones@gruposervired.com.co'],
+  Multired: ['aplicaciones@gruposervired.com.co']
 };
 
 export const sendExcelEmail = async (options: SendExcelEmailOptions): Promise<void> => {

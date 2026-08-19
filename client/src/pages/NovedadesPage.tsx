@@ -24,15 +24,7 @@ export const NovedadesPage = () => {
         dashboard.empresaFilter || undefined
       );
       if (dashboard.empresaFilter) {
-        try {
-          await reporteService.enviarHorasExtrasEmail(
-            dashboard.selectedFechaCorteId ?? null,
-            dashboard.empresaFilter
-          );
-          dashboard.setStatus({ type: 'success', message: `Excel descargado y correo enviado a destinatarios de ${dashboard.empresaFilter}.` });
-        } catch {
-          dashboard.setStatus({ type: 'error', message: 'El Excel se descargó pero falló el envío del correo.' });
-        }
+        dashboard.setStatus({ type: 'success', message: `Excel descargado y correo enviado a destinatarios de ${dashboard.empresaFilter}.` });
       } else {
         dashboard.setStatus({ type: 'success', message: 'Excel descargado correctamente.' });
       }

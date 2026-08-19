@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { createCargo, listCargos } from '../services/cargoService';
 import { getApiErrorMessage } from '../services/api';
-import { reporteService } from '../services/reporteService';
 import { fechaCorteService, type FechaCortePayload } from '../services/fechaCorteService';
 import {
   createPersona,
@@ -194,12 +193,7 @@ export const useDashboard = () => {
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(url);
       if (empresa) {
-        try {
-          await reporteService.enviarHorasExtrasEmail(id, empresa);
-          setStatus({ type: 'success', message: `Excel descargado y correo enviado a destinatarios de ${empresa}.` });
-        } catch {
-          setStatus({ type: 'error', message: 'El Excel se descargó pero falló el envío del correo.' });
-        }
+        setStatus({ type: 'success', message: `Excel descargado y correo enviado a destinatarios de ${empresa}.` });
       } else {
         setStatus({ type: 'success', message: 'Fecha de corte finalizada y Excel descargado.' });
       }
