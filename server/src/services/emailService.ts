@@ -1,24 +1,16 @@
 import nodemailer from 'nodemailer';
 
-const transporterServired = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
+function createTransporter(empresa: 'Servired' | 'Multired') {
+  const user = empresa === 'Multired' ? process.env.SMTP_USER_MULTIRED : process.env.SMTP_USER;
+  const pass = empresa === 'Multired' ? process.env.SMTP_PASS_MULTIRED : process.env.SMTP_PASS;
 
-const transporterMultired = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER_MULTIRED,
-    pass: process.env.SMTP_PASS_MULTIRED
-  }
-});
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: false,
+    auth: { user, pass }
+  });
+}
 
 interface SendExcelEmailOptions {
   empresa: 'Servired' | 'Multired';
@@ -35,13 +27,14 @@ const RECIPIENTS: Record<string, string[]> = {
 export const sendExcelEmail = async (options: SendExcelEmailOptions): Promise<void> => {
   const { empresa, filename, buffer, periodo } = options;
 
-  const transporter = empresa === 'Multired' ? transporterMultired : transporterServired;
   const from = empresa === 'Multired' ? process.env.SMTP_USER_MULTIRED : process.env.SMTP_USER;
   const to = RECIPIENTS[empresa];
 
   if (!from) {
     throw new Error(`No hay configurado un correo SMTP para ${empresa}. Verifica las variables SMTP en .env`);
   }
+
+  const transporter = createTransporter(empresa);
 
   await transporter.sendMail({
     from,
