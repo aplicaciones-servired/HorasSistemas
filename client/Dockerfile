@@ -1,18 +1,18 @@
-FROM node:20-alpine AS build
+FROM node:lts
+
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --legacy-peer-deps
+
+# Copiar el resto del código de la aplicación
 COPY . .
+
+# Instalar dependencias necesarias
+RUN npm install
+
+# Construir la aplicación
 RUN npm run build
 
-FROM nginx:alpine
-RUN apk add --no-cache openssl
-RUN mkdir -p /etc/nginx/ssl && \
-    openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
-      -keyout /etc/nginx/ssl/key.pem \
-      -out /etc/nginx/ssl/cert.pem \
-      -subj "/C=CO/ST=Valle/L=Jamundi/O=Servired/OU=IT/CN=horas.serviredgane.cloud"
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 5174 5175
-CMD ["nginx", "-g", "daemon off;"]
+# Exponer el puerto en el que correrá la aplicación
+EXPOSE 80
+
+# Comando para iniciar la aplicación
+CMD ["npm", "start"]
