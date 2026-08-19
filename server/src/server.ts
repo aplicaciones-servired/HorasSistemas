@@ -9,8 +9,8 @@ const start = async (): Promise<void> => {
     await sequelize.authenticate();
     console.log('Conexion con la base de datos establecida');
 
-    app.listen(port, () => {
-      console.log(`Servidor ejecutandose en http://localhost:${port}`);
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`Servidor ejecutandose en http://0.0.0.0:${port}`);
     });
   } catch (error) {
     console.error('No se pudo iniciar el servidor', error);
