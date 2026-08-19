@@ -102,11 +102,11 @@ export const useDashboard = () => {
         fechaCorteService.list(empresa)
       ]);
 
-      setCargos(nextCargos);
-      setPersonas(nextPersonas);
-      setRegistros(nextRegistros);
-      setTurnos(nextTurnos);
-      setFechasCorte(nextFechasCorte);
+      setCargos(Array.isArray(nextCargos) ? nextCargos : []);
+      setPersonas(Array.isArray(nextPersonas) ? nextPersonas : []);
+      setRegistros(Array.isArray(nextRegistros) ? nextRegistros : []);
+      setTurnos(Array.isArray(nextTurnos) ? nextTurnos : []);
+      setFechasCorte(Array.isArray(nextFechasCorte) ? nextFechasCorte : []);
       setLastRefresh(new Date());
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo cargar la información inicial') });
@@ -126,7 +126,7 @@ export const useDashboard = () => {
     }
     try {
       const regs = await fechaCorteService.listRegistros(selectedFechaCorteId);
-      setRegistrosFechaCorte(regs);
+      setRegistrosFechaCorte(Array.isArray(regs) ? regs : []);
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudieron cargar los registros de la fecha de corte') });
     }

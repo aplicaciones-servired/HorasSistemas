@@ -12,5 +12,8 @@ const enableLogging = process.env.DB_LOGGING === 'true';
 export const sequelize = new Sequelize(databaseName, databaseUser, databasePassword, {
   host: databaseHost,
   dialect: 'mysql',
-  logging: enableLogging ? console.log : false
+  logging: enableLogging ? console.log : false,
+  dialectOptions: {
+    bigNumberStrings: false
+  }
 });
