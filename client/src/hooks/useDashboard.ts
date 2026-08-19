@@ -124,7 +124,7 @@ export const useDashboard = () => {
       return;
     }
     try {
-      const regs = await fechaCorteService.listRegistros(selectedFechaCorteId);
+      const regs = await fechaCorteService.listRegistros(selectedFechaCorteId, empresaFilter || undefined);
       setRegistrosFechaCorte(Array.isArray(regs) ? regs : []);
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudieron cargar los registros de la fecha de corte') });
@@ -133,7 +133,7 @@ export const useDashboard = () => {
 
   useEffect(() => {
     void refreshRegistrosFechaCorte();
-  }, [selectedFechaCorteId]);
+  }, [selectedFechaCorteId, empresaFilter]);
 
   const handleCreateFechaCorte = async (values: FechaCorteFormValues): Promise<void> => {
     setIsSavingFechaCorte(true);

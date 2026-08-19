@@ -110,7 +110,7 @@ export const FechaCorteSelector = ({
           </select>
         </label>
 
-        {selected && !selected.completada && (
+        {selected && (
           <>
             <button
               type="button"
@@ -128,21 +128,9 @@ export const FechaCorteSelector = ({
               disabled={isSaving}
               style={{ alignSelf: 'end', marginBottom: '2px' }}
             >
-              Finalizar fecha de corte
+              {selected.completada ? 'Regenerar Excel' : 'Finalizar fecha de corte'}
             </button>
           </>
-        )}
-
-        {selected?.completada && (
-          <button
-            type="button"
-            className="primary-button"
-            onClick={() => onFinalizar(selected.id)}
-            disabled={isSaving}
-            style={{ alignSelf: 'end', marginBottom: '2px' }}
-          >
-            {isSaving ? 'Generando...' : 'Regenerar Excel'}
-          </button>
         )}
       </div>
     </section>

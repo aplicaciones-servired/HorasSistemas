@@ -44,8 +44,10 @@ export const fechaCorteService = {
     return response.data;
   },
 
-  async listRegistros(id: number): Promise<RegistroAsistencia[]> {
-    const response = await api.get<RegistroAsistencia[]>(`/fechas-corte/${id}/registros`);
+  async listRegistros(id: number, empresa?: string): Promise<RegistroAsistencia[]> {
+    const params: any = {};
+    if (empresa) params.empresa = empresa;
+    const response = await api.get<RegistroAsistencia[]>(`/fechas-corte/${id}/registros`, { params });
     return response.data;
   }
 };

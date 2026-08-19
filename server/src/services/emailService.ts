@@ -24,11 +24,17 @@ const RECIPIENTS: Record<string, string[]> = {
   Multired: ['aplicaciones@gruposervired.com.co']
 };
 
+const SIGNATURES: Record<string, string> = {
+  Servired: 'Antony Hubeimar Chavez Lopez',
+  Multired: 'Diego Giraldo Garcia'
+};
+
 export const sendExcelEmail = async (options: SendExcelEmailOptions): Promise<void> => {
   const { empresa, filename, buffer, periodo } = options;
 
   const from = empresa === 'Multired' ? process.env.SMTP_USER_MULTIRED : process.env.SMTP_USER;
   const to = RECIPIENTS[empresa];
+  const firma = SIGNATURES[empresa];
 
   if (!from) {
     throw new Error(`No hay configurado un correo SMTP para ${empresa}. Verifica las variables SMTP en .env`);
@@ -43,7 +49,7 @@ export const sendExcelEmail = async (options: SendExcelEmailOptions): Promise<vo
     html: `
       <p>Cordial saludo,</p>
       <p>Se adjunta el reporte de horas extras de <strong>${empresa}</strong> correspondiente al período <strong>${periodo}</strong>.</p>
-      <p>Att,<br/>Sistema de Control de Nómina</p>
+      <p>Att,<br/>${firma}</p>
     `,
     attachments: [
       {

@@ -121,11 +121,7 @@ export const deleteFechaCorte = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  if (fecha.completada) {
-    res.status(400).json({ message: 'No se puede eliminar una fecha de corte ya finalizada' });
-    return;
-  }
-
+  await RegistroAsistencia.destroy({ where: { fechaCorteId: fecha.id } });
   await fecha.destroy();
   res.status(204).send();
 };
@@ -188,6 +184,7 @@ export const finalizarFechaCorte = async (req: Request, res: Response): Promise<
 
 export const listRegistrosByFechaCorte = async (req: Request, res: Response): Promise<void> => {
   const id = String(req.params.id);
+  const empresa = req.query.empresa as string | undefined;
   const fecha = await FechaCorte.findByPk(id);
 
   if (!fecha) {
@@ -195,12 +192,25 @@ export const listRegistrosByFechaCorte = async (req: Request, res: Response): Pr
     return;
   }
 
+  const where: any = { fechaCorteId: fecha.id };
+  const includeOptions: any[] = [
+    { model: Cargo, as: 'cargo' }
+  ];
+
+  if (empresa) {
+    includeOptions.unshift({
+      model: Persona,
+      as: 'persona',
+      where: { empresa },
+      required: true
+    });
+  } else {
+    includeOptions.unshift({ model: Persona, as: 'persona' });
+  }
+
   const registros = await RegistroAsistencia.findAll({
-    where: { fechaCorteId: fecha.id },
-    include: [
-      { model: Persona, as: 'persona' },
-      { model: Cargo, as: 'cargo' }
-    ],
+    where,
+    include: includeOptions,
     order: [['fecha', 'ASC'], ['horaEntrada', 'ASC']]
   });
 
