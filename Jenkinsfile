@@ -40,7 +40,7 @@ pipeline {
     stage('sync database schema') {
       steps {
         script {
-          sh 'cd ./server && npm run db:sync'
+          sh 'cd ./server && npm run db:migrate'
         }
       }
     }

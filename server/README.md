@@ -19,4 +19,4 @@ Backend en TypeScript con Express y Sequelize para registrar personas, cargos y 
 - `npm run dev`
 - `npm run build`
 - `npm run start`
-- `npm run db:sync`
+- `npm run db:migrate`
