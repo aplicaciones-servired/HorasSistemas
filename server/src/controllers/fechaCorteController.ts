@@ -76,6 +76,9 @@ export const createFechaCorte = async (req: Request, res: Response): Promise<voi
     empresa: empresa || null
   });
 
+  console.log('[createFechaCorte] Datos recibidos:', { fechaInicio, fechaFin, descripcion, empresa });
+  console.log('[createFechaCorte] Registro creado:', fecha.toJSON());
+
   res.status(201).json(fecha);
 };
 
