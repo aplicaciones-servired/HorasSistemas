@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { createCargo, listCargos } from '../services/cargoService';
 import { getApiErrorMessage } from '../services/api';
-import { fechaCorteService, type FechaCortePayload } from '../services/fechaCorteService';
+import { fechaCorteService } from '../services/fechaCorteService';
 import {
   createPersona,
   deletePersona,
@@ -84,10 +84,15 @@ export const useDashboard = () => {
   const [selectedFechaCorteId, setSelectedFechaCorteId] = useState<number | null>(null);
   const [registrosFechaCorte, setRegistrosFechaCorte] = useState<RegistroAsistencia[]>([]);
   const [isSavingFechaCorte, setIsSavingFechaCorte] = useState(false);
+  const refreshRequestId = useRef(0);
   const [empresaFilter, setEmpresaFilter] = useState<string>(() => {
     if (userCompany === 'Servired' || userCompany === 'Multired') return userCompany;
     return '';
   });
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const openDrawer = (): void => setDrawerOpen(true);
+  const closeDrawer = (): void => setDrawerOpen(false);
 
   const selectedFechaCorte = fechasCorte.find((f) => f.id === selectedFechaCorteId) ?? null;
 
@@ -95,10 +100,10 @@ export const useDashboard = () => {
     setStatus((current) => (current.type === 'success' ? current : { type: 'idle', message: '' }));
   };
 
-  const refreshData = async (): Promise<void> => {
+  const refreshData = async (empresa: string | undefined = empresaFilter || undefined): Promise<void> => {
+    const requestId = ++refreshRequestId.current;
     setIsLoading(true);
     try {
-      const empresa = empresaFilter || undefined;
       const [nextCargos, nextPersonas, nextRegistros, nextTurnos, nextFechasCorte] = await Promise.all([
         listCargos(),
         listPersonas(empresa),
@@ -106,6 +111,8 @@ export const useDashboard = () => {
         listTurnos(),
         fechaCorteService.list(empresa)
       ]);
+
+      if (requestId !== refreshRequestId.current) return;
 
       setCargos(Array.isArray(nextCargos) ? nextCargos : []);
       setPersonas(Array.isArray(nextPersonas) ? nextPersonas : []);
@@ -116,12 +123,12 @@ export const useDashboard = () => {
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo cargar la información inicial') });
     } finally {
-      setIsLoading(false);
+      if (requestId === refreshRequestId.current) setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    void refreshData();
+    void refreshData(empresaFilter || undefined);
   }, [empresaFilter]);
 
   const refreshRegistrosFechaCorte = async (): Promise<void> => {
@@ -360,6 +367,7 @@ export const useDashboard = () => {
       esDominical: registro.esDominical
     });
     setStatus({ type: 'info', message: 'Registro cargado para edición.' });
+    setDrawerOpen(true);
   };
 
   const resetRegistroForm = (): void => {
@@ -367,6 +375,7 @@ export const useDashboard = () => {
     setFoundPersona(null);
     setLookupState('idle');
     setRegistroForm(initialRegistroForm);
+    setDrawerOpen(false);
   };
 
   const handleBuscarCedula = async (): Promise<void> => {
@@ -451,7 +460,6 @@ export const useDashboard = () => {
         registroPayload.fecha = registroForm.fecha;
         await updateRegistro(editingRegistroId, registroPayload);
         setStatus({ type: 'success', message: 'Registro actualizado correctamente.' });
-        resetRegistroForm();
       } else {
         let created = 0;
         let updated = 0;
@@ -473,9 +481,6 @@ export const useDashboard = () => {
           }
         }
 
-        setFoundPersona(persona);
-        setLookupState('found');
-
         const total = fechas.length;
         if (total === 1) {
           setStatus({
@@ -488,19 +493,30 @@ export const useDashboard = () => {
             message: `${total} registros procesados (${created} creados, ${updated} actualizados).`
           });
         }
-
-        setRegistroForm((current) => ({
-          ...current,
-          fechas: [],
-          horaEntrada: '',
-          horaSalida: '',
-          observacion: ''
-        }));
       }
 
       await refreshData();
       if (selectedFechaCorteId) {
         await refreshRegistrosFechaCorte();
+      }
+
+      if (editingRegistroId) {
+        resetRegistroForm();
+      } else {
+        setRegistroForm((current) => ({
+          ...current,
+          cedula: '',
+          nombres: '',
+          apellidos: '',
+          empresa: '',
+          cargoId: '',
+          fechas: [],
+          horaEntrada: '',
+          horaSalida: '',
+          observacion: ''
+        }));
+        setFoundPersona(null);
+        setLookupState('idle');
       }
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo guardar el registro') });
@@ -645,6 +661,9 @@ export const useDashboard = () => {
     isSavingFechaCorte,
     empresaFilter,
     setEmpresaFilter,
+    drawerOpen,
+    openDrawer,
+    closeDrawer,
     setStatus,
     updateRegistroField,
     updateCargoField,

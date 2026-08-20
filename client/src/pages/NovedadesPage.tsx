@@ -2,6 +2,7 @@ import { RegistroForm } from '../components/forms/RegistroForm';
 import { DashboardHeader } from '../components/layout/DashboardHeader';
 import { RegistrosTable } from '../components/tables/RegistrosTable';
 import { FechaCorteSelector } from '../components/fechasCorte/FechaCorteSelector';
+import { Drawer } from '../components/ui/Drawer';
 import { useDashboard } from '../hooks/useDashboard';
 import { useAuth } from '../components/auth/useAuth';
 import { StatusToaster } from '../components/toast/StatusToaster';
@@ -19,6 +20,13 @@ export const NovedadesPage = () => {
     if (!dashboard.empresaFilter) return dashboard.personas;
     return dashboard.personas.filter((p) => p.empresa === dashboard.empresaFilter);
   }, [dashboard.personas, dashboard.empresaFilter]);
+
+  const registrosFiltrados = useMemo(() => {
+    if (!dashboard.empresaFilter) return dashboard.registrosFechaCorte;
+    return dashboard.registrosFechaCorte.filter((r) => r.persona?.empresa === dashboard.empresaFilter);
+  }, [dashboard.registrosFechaCorte, dashboard.empresaFilter]);
+
+  const drawerTitle = dashboard.editingRegistroId ? 'Editar novedad' : 'Registrar asistencia';
 
   const handleDescargarHorasExtras = async () => {
     try {
@@ -88,46 +96,54 @@ export const NovedadesPage = () => {
         />
       </section>
 
-      {dashboard.selectedFechaCorte && (
-        <section className="workspace-grid workspace-grid--single">
-          <RegistroForm
-            values={dashboard.registroForm}
-            cargos={dashboard.cargos}
-            personas={personasFiltradas}
-            turnos={dashboard.turnos}
-            personaEncontrada={dashboard.foundPersona}
-            lookupState={dashboard.lookupState}
-            isSaving={dashboard.isSavingRegistro}
-            isEditing={!!dashboard.editingRegistroId}
-            onChange={dashboard.updateRegistroField}
-            onBuscarCedula={dashboard.handleBuscarCedula}
-            onSelectPersona={dashboard.handleSelectPersona}
-            onReset={dashboard.resetRegistroForm}
-            onSubmit={dashboard.handleGuardarRegistro}
-          />
-        </section>
-      )}
-
       {dashboard.selectedFechaCorteId && (
         <>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', marginBottom: '10px', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', marginBottom: '10px', gap: '12px' }}>
+            <button
+              type="button"
+              className="primary-button"
+              onClick={() => {
+                dashboard.resetRegistroForm();
+                dashboard.openDrawer();
+              }}
+            >
+              + Nuevo registro
+            </button>
             <button
               type="button"
               className="primary-button"
               onClick={handleDescargarHorasExtras}
-              disabled={descargando || dashboard.registrosFechaCorte.length === 0}
+              disabled={descargando || registrosFiltrados.length === 0}
             >
-              {descargando ? 'Descargando...' : '⏰ Horas Extras'}
+              {descargando ? 'Descargando...' : 'Horas Extras'}
             </button>
           </div>
 
           <RegistrosTable
-            registros={dashboard.registrosFechaCorte}
+            registros={registrosFiltrados}
             onEdit={dashboard.loadRegistroForEdit}
             onDelete={dashboard.handleEliminarRegistro}
           />
         </>
       )}
+
+      <Drawer open={dashboard.drawerOpen} title={drawerTitle} onClose={dashboard.closeDrawer}>
+        <RegistroForm
+          values={dashboard.registroForm}
+          cargos={dashboard.cargos}
+          personas={personasFiltradas}
+          turnos={dashboard.turnos}
+          personaEncontrada={dashboard.foundPersona}
+          lookupState={dashboard.lookupState}
+          isSaving={dashboard.isSavingRegistro}
+          isEditing={!!dashboard.editingRegistroId}
+          onChange={dashboard.updateRegistroField}
+          onBuscarCedula={dashboard.handleBuscarCedula}
+          onSelectPersona={dashboard.handleSelectPersona}
+          onReset={dashboard.resetRegistroForm}
+          onSubmit={dashboard.handleGuardarRegistro}
+        />
+      </Drawer>
 
       {dashboard.isLoading ? <div className="loading-banner">Cargando datos iniciales...</div> : null}
     </>

@@ -8,26 +8,26 @@ const horasExtrasService = new HorasExtrasService();
 export const listFechasCorte = async (req: Request, res: Response): Promise<void> => {
   const empresa = req.query.empresa as string | undefined;
 
-  const includeOptions: any[] = [
-    {
-      model: RegistroAsistencia,
-      as: 'registros',
-      attributes: ['id'],
-      ...(empresa ? {
-        required: true,
-        include: [{
-          model: Persona,
-          as: 'persona',
-          attributes: ['id'],
-          required: true,
-          where: { empresa }
-        }]
-      } : {})
-    }
-  ];
-
   const fechas = await FechaCorte.findAll({
-    include: includeOptions,
+    include: [
+      {
+        model: RegistroAsistencia,
+        as: 'registros',
+        attributes: ['id'],
+        required: Boolean(empresa),
+        ...(empresa
+          ? {
+              include: [{
+                model: Persona,
+                as: 'persona',
+                attributes: ['id'],
+                required: true,
+                where: { empresa }
+              }]
+            }
+          : {})
+      }
+    ],
     order: [['createdAt', 'DESC']]
   });
 
@@ -184,7 +184,7 @@ export const finalizarFechaCorte = async (req: Request, res: Response): Promise<
 
 export const listRegistrosByFechaCorte = async (req: Request, res: Response): Promise<void> => {
   const id = String(req.params.id);
-  const empresa = req.query.empresa as string | undefined;
+  const empresa = (req.query.empresa as string | undefined)?.trim();
   const fecha = await FechaCorte.findByPk(id);
 
   if (!fecha) {
@@ -198,14 +198,14 @@ export const listRegistrosByFechaCorte = async (req: Request, res: Response): Pr
   ];
 
   if (empresa) {
-    includeOptions.unshift({
+    includeOptions.push({
       model: Persona,
       as: 'persona',
       where: { empresa },
       required: true
     });
   } else {
-    includeOptions.unshift({ model: Persona, as: 'persona' });
+    includeOptions.push({ model: Persona, as: 'persona' });
   }
 
   const registros = await RegistroAsistencia.findAll({

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Cargo, Persona } from '../models';
 
 export const listPersonas = async (request: Request, response: Response): Promise<void> => {
-  const empresa = request.query.empresa as string | undefined;
+  const empresa = (request.query.empresa as string | undefined)?.trim();
   const where: any = {};
   if (empresa) where.empresa = empresa;
 

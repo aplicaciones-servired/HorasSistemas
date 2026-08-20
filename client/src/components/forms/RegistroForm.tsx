@@ -198,11 +198,13 @@ export const RegistroForm = ({
                 ? 'Editando la novedad seleccionada.'
                 : values.fechas.length > 1
                   ? `Se crearán ${values.fechas.length} registros, uno por cada fecha seleccionada.`
-                  : 'Si la cédula no existe, el sistema crea la persona y luego guarda la novedad.'}
+                  : 'El panel se mantiene abierto para registrar múltiples personas seguidas.'}
             </p>
-            <button type="button" className="ghost-button" onClick={onReset} disabled={!isEditing || isSaving}>
-              Cancelar edición
-            </button>
+            {isEditing && (
+              <button type="button" className="ghost-button" onClick={onReset} disabled={isSaving}>
+                Cancelar edición
+              </button>
+            )}
             <button type="submit" className="primary-button" disabled={isSaving || values.fechas.length === 0}>
               {isSaving ? 'Guardando...' : isEditing ? 'Actualizar novedad' : values.fechas.length > 1 ? `Guardar ${values.fechas.length} registros` : 'Guardar novedad'}
             </button>

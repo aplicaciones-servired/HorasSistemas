@@ -130,10 +130,7 @@ export const FechaCorteSelector = ({
         <div className="loading-banner">Cargando períodos...</div>
       ) : fechasCorte.length === 0 ? (
         <div className="empty-state">
-          <p>No hay períodos de corte creados aún.</p>
-          <button type="button" className="primary-button" onClick={() => setShowForm(true)}>
-            Crear primer período
-          </button>
+          <p>No hay períodos de corte creados aún. Usa <strong>+ Nueva fecha de corte</strong> arriba para crear el primero.</p>
         </div>
       ) : (
         <>

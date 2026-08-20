@@ -4,7 +4,7 @@ import { Cargo, Persona, RegistroAsistencia } from '../models';
 export const listRegistros = async (request: Request, response: Response): Promise<void> => {
   const where: any = {};
   const fechaCorteId = request.query.fechaCorteId;
-  const empresa = request.query.empresa as string | undefined;
+  const empresa = (request.query.empresa as string | undefined)?.trim();
 
   if (fechaCorteId) {
     where.fechaCorteId = Number(fechaCorteId);
@@ -15,14 +15,14 @@ export const listRegistros = async (request: Request, response: Response): Promi
   ];
 
   if (empresa) {
-    includeOptions.unshift({
+    includeOptions.push({
       model: Persona,
       as: 'persona',
       where: { empresa },
       required: true
     });
   } else {
-    includeOptions.unshift({ model: Persona, as: 'persona' });
+    includeOptions.push({ model: Persona, as: 'persona' });
   }
 
   const registros = await RegistroAsistencia.findAll({
