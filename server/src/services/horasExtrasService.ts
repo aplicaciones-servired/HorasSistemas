@@ -372,7 +372,7 @@ export class HorasExtrasService {
     const fechas = filas.map((f) => new Date(`${f.fecha}T12:00:00`));
     const periodo =
       filas.length > 0
-        ? `${formatearPeriodo(new Date(Math.min(...fechas.map((d) => d.getTime()))), false)} al ${formatearPeriodo(new Date(Math.max(...fechas.map((d) => d.getTime()))), true)}`
+        ? `${formatearPeriodo(new Date(fechas.reduce((min, d) => Math.min(min, d.getTime()), Infinity)), false)} al ${formatearPeriodo(new Date(fechas.reduce((max, d) => Math.max(max, d.getTime()), -Infinity)), true)}`
         : "";
 
     worksheet.getCell("A5").value = "PERIODO:";

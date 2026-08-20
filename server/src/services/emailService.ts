@@ -21,9 +21,12 @@ interface SendExcelEmailOptions {
 }
 
 const correo = process.env.ENVIO_MAIL;
+if (!correo) {
+  console.error('⚠️  Variable de entorno ENVIO_MAIL no configurada. Los correos no se enviarán.');
+}
 const RECIPIENTS: Record<string, string[]> = {
-  Servired: [correo as string],
-  Multired: [correo as string]
+  Servired: [correo ?? ''],
+  Multired: [correo ?? '']
 };
 
 const SIGNATURES: Record<string, string> = {
@@ -40,6 +43,10 @@ export const sendExcelEmail = async (options: SendExcelEmailOptions): Promise<vo
 
   if (!from) {
     throw new Error(`No hay configurado un correo SMTP para ${empresa}. Verifica las variables SMTP en .env`);
+  }
+
+  if (!to || to.length === 0 || !to[0]) {
+    throw new Error(`No hay destinatario configurado para ${empresa}. Verifica ENVIO_MAIL en .env`);
   }
 
   const transporter = createTransporter(empresa);

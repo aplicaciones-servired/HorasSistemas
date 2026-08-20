@@ -39,10 +39,10 @@ export class HorasExtrasController {
         const fechas = registrosFiltrados.map((r: any) => new Date(`${r.fecha}T12:00:00`));
         let periodo = fecha;
         if (fechas.length > 0) {
-          const min = new Date(Math.min(...fechas.map((d: Date) => d.getTime())));
-          const max = new Date(Math.max(...fechas.map((d: Date) => d.getTime())));
+          const minTs = fechas.reduce((min: number, d: Date) => Math.min(min, d.getTime()), Infinity);
+          const maxTs = fechas.reduce((max: number, d: Date) => Math.max(max, d.getTime()), -Infinity);
           const fmt = (d: Date) => `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
-          periodo = `${fmt(min)} al ${fmt(max)}`;
+          periodo = `${fmt(new Date(minTs))} al ${fmt(new Date(maxTs))}`;
         }
         sendExcelEmail({
           empresa: empresa as 'Servired' | 'Multired',
@@ -68,13 +68,14 @@ export class HorasExtrasController {
         empresa?: string;
       };
 
-      if (!empresa || !['Servired', 'Multired'].includes(empresa)) {
+      const empresaTrimmed = empresa?.trim();
+      if (!empresaTrimmed || !['Servired', 'Multired'].includes(empresaTrimmed)) {
         return res.status(400).json({ error: 'empresa es obligatoria y debe ser "Servired" o "Multired"' });
       }
 
       const where: any = {};
       if (fechaCorteId) {
-        where.fechaCorteId = fechaCorteId;
+        where.fechaCorteId = Number(fechaCorteId);
       }
 
       const registros = await RegistroAsistencia.findAll({
@@ -89,23 +90,23 @@ export class HorasExtrasController {
         return res.status(404).json({ error: 'No hay registros de asistencia' });
       }
 
-      const buffer = await horasExtrasService.generarExcel(registros, empresa);
+      const buffer = await horasExtrasService.generarExcel(registros, empresaTrimmed);
 
       const fecha = new Date().toISOString().split('T')[0];
-      const filename = `Novedades_nomina_jamundi_${empresa}_${fecha}.xlsx`;
+      const filename = `Novedades_nomina_jamundi_${empresaTrimmed}_${fecha}.xlsx`;
 
-      const registrosFiltrados = registros.filter((r: any) => r.persona?.empresa === empresa);
+      const registrosFiltrados = registros.filter((r: any) => r.persona?.empresa === empresaTrimmed);
       const fechas = registrosFiltrados.map((r: any) => new Date(`${r.fecha}T12:00:00`));
       let periodo = fecha;
       if (fechas.length > 0) {
-        const min = new Date(Math.min(...fechas.map((d: Date) => d.getTime())));
-        const max = new Date(Math.max(...fechas.map((d: Date) => d.getTime())));
+        const minTs = fechas.reduce((min: number, d: Date) => Math.min(min, d.getTime()), Infinity);
+        const maxTs = fechas.reduce((max: number, d: Date) => Math.max(max, d.getTime()), -Infinity);
         const fmt = (d: Date) => `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
-        periodo = `${fmt(min)} al ${fmt(max)}`;
+        periodo = `${fmt(new Date(minTs))} al ${fmt(new Date(maxTs))}`;
       }
 
       await sendExcelEmail({
-        empresa: empresa as 'Servired' | 'Multired',
+        empresa: empresaTrimmed as 'Servired' | 'Multired',
         filename,
         buffer: Buffer.from(buffer),
         periodo

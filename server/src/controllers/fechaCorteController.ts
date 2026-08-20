@@ -76,9 +76,6 @@ export const createFechaCorte = async (req: Request, res: Response): Promise<voi
     empresa: empresa || null
   });
 
-  console.log('[createFechaCorte] Datos recibidos:', { fechaInicio, fechaFin, descripcion, empresa });
-  console.log('[createFechaCorte] Registro creado:', fecha.toJSON());
-
   res.status(201).json(fecha);
 };
 
@@ -126,7 +123,7 @@ export const deleteFechaCorte = async (req: Request, res: Response): Promise<voi
 
 export const finalizarFechaCorte = async (req: Request, res: Response): Promise<void> => {
   const id = String(req.params.id);
-  const empresa = req.query.empresa as string | undefined;
+  const empresa = (req.query.empresa as string | undefined)?.trim();
   const fecha = await FechaCorte.findByPk(id);
 
   if (!fecha) {
@@ -162,10 +159,10 @@ export const finalizarFechaCorte = async (req: Request, res: Response): Promise<
     const fechas = registrosFiltrados.map((r: any) => new Date(`${r.fecha}T12:00:00`));
     let periodo = `${fecha.fechaInicio} al ${fecha.fechaFin}`;
     if (fechas.length > 0) {
-      const min = new Date(Math.min(...fechas.map((d: Date) => d.getTime())));
-      const max = new Date(Math.max(...fechas.map((d: Date) => d.getTime())));
+      const minTs = fechas.reduce((min: number, d: Date) => Math.min(min, d.getTime()), Infinity);
+      const maxTs = fechas.reduce((max: number, d: Date) => Math.max(max, d.getTime()), -Infinity);
       const fmt = (d: Date) => `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
-      periodo = `${fmt(min)} al ${fmt(max)}`;
+      periodo = `${fmt(new Date(minTs))} al ${fmt(new Date(maxTs))}`;
     }
     sendExcelEmail({
       empresa: empresa as 'Servired' | 'Multired',

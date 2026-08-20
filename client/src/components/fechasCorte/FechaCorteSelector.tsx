@@ -15,7 +15,7 @@ interface FechaCorteSelectorProps {
   onEmpresaFilterChange: (empresa: string) => void;
 }
 
-const today = new Date().toISOString().slice(0, 10);
+const getToday = () => new Date().toISOString().slice(0, 10);
 const PAGE_SIZE = 6;
 
 const formatDate = (dateStr: string) => {
@@ -39,8 +39,8 @@ export const FechaCorteSelector = ({
 }: FechaCorteSelectorProps) => {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<FechaCorteFormValues>({
-    fechaInicio: today,
-    fechaFin: today,
+    fechaInicio: getToday(),
+    fechaFin: getToday(),
     descripcion: ''
   });
   const [dateFrom, setDateFrom] = useState('');
@@ -69,7 +69,7 @@ export const FechaCorteSelector = ({
   const handleCreate = () => {
     if (!form.fechaInicio || !form.fechaFin) return;
     onCreate(form);
-    setForm({ fechaInicio: today, fechaFin: today, descripcion: '' });
+    setForm({ fechaInicio: getToday(), fechaFin: getToday(), descripcion: '' });
     setShowForm(false);
   };
 

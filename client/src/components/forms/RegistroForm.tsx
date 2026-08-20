@@ -135,9 +135,7 @@ export const RegistroForm = ({
                 onClick={() => {
                   onChange('horaEntrada', turno.horaEntrada);
                   onChange('horaSalida', turno.horaSalida);
-                  if (turno.esDominical) {
-                    onChange('esDominical', true);
-                  }
+                  onChange('esDominical', turno.esDominical);
                 }}
               >
                 {turno.nombre}

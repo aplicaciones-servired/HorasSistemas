@@ -17,7 +17,7 @@ export const StatusToaster = ({ status }: StatusToasterProps) => {
 
     handled.current = status;
     toast[status.type](status.message);
-  });
+  }, [status, toast]);
 
   return null;
 };

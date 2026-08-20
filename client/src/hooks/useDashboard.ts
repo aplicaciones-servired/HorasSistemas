@@ -28,21 +28,21 @@ import type {
   Turno
 } from '../types/domain';
 
-const today = new Date().toISOString().slice(0, 10);
+const getToday = () => new Date().toISOString().slice(0, 10);
 
-const initialRegistroForm: RegistroFormValues = {
+const buildInitialRegistroForm = (): RegistroFormValues => ({
   cedula: '',
   nombres: '',
   apellidos: '',
   empresa: '',
   cargoId: '',
-  fecha: today,
-  fechas: [today],
+  fecha: getToday(),
+  fechas: [getToday()],
   horaEntrada: '',
   horaSalida: '',
   observacion: '',
   esDominical: false
-};
+});
 
 const initialCargoForm: CargoFormValues = {
   nombre: '',
@@ -65,7 +65,7 @@ export const useDashboard = () => {
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [registros, setRegistros] = useState<RegistroAsistencia[]>([]);
   const [turnos, setTurnos] = useState<Turno[]>([]);
-  const [registroForm, setRegistroForm] = useState<RegistroFormValues>(initialRegistroForm);
+  const [registroForm, setRegistroForm] = useState<RegistroFormValues>(buildInitialRegistroForm());
   const [cargoForm, setCargoForm] = useState<CargoFormValues>(initialCargoForm);
   const [personaForm, setPersonaForm] = useState<PersonaFormValues>(initialPersonaForm);
   const [editingPersonaId, setEditingPersonaId] = useState<number | null>(null);
@@ -376,7 +376,7 @@ export const useDashboard = () => {
     setEditingRegistroId(null);
     setFoundPersona(null);
     setLookupState('idle');
-    setRegistroForm(initialRegistroForm);
+    setRegistroForm(buildInitialRegistroForm());
     setDrawerOpen(false);
   };
 
@@ -512,10 +512,12 @@ export const useDashboard = () => {
           apellidos: '',
           empresa: '',
           cargoId: '',
+          fecha: getToday(),
           fechas: [],
           horaEntrada: '',
           horaSalida: '',
-          observacion: ''
+          observacion: '',
+          esDominical: false
         }));
         setFoundPersona(null);
         setLookupState('idle');
