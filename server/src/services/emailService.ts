@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer';
 function createTransporter(empresa: 'Servired' | 'Multired') {
   const user = empresa === 'Multired' ? process.env.SMTP_USER_MULTIRED : process.env.SMTP_USER;
   const pass = empresa === 'Multired' ? process.env.SMTP_PASS_MULTIRED : process.env.SMTP_PASS;
+  
 
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -19,9 +20,10 @@ interface SendExcelEmailOptions {
   periodo: string;
 }
 
+const correo = process.env.ENVIO_MAIL;
 const RECIPIENTS: Record<string, string[]> = {
-  Servired: ['aplicaciones@gruposervired.com.co'],
-  Multired: ['aplicaciones@gruposervired.com.co']
+  Servired: [correo as string],
+  Multired: [correo as string]
 };
 
 const SIGNATURES: Record<string, string> = {
