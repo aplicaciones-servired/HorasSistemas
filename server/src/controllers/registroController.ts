@@ -10,24 +10,18 @@ export const listRegistros = async (request: Request, response: Response): Promi
     where.fechaCorteId = Number(fechaCorteId);
   }
 
-  const includeOptions: any[] = [
-    { model: Cargo, as: 'cargo' }
-  ];
-
   if (empresa) {
-    includeOptions.push({
-      model: Persona,
-      as: 'persona',
-      where: { empresa },
-      required: true
-    });
-  } else {
-    includeOptions.push({ model: Persona, as: 'persona' });
+    const personas = await Persona.findAll({ where: { empresa }, attributes: ['id'], raw: true });
+    const personaIds = personas.map((p) => p.id);
+    where.personaId = personaIds.length > 0 ? personaIds : [-1];
   }
 
   const registros = await RegistroAsistencia.findAll({
     where,
-    include: includeOptions,
+    include: [
+      { model: Persona, as: 'persona' },
+      { model: Cargo, as: 'cargo' }
+    ],
     order: [['fecha', 'DESC'], ['horaEntrada', 'DESC']]
   });
 

@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS fechas_corte (
   fechaInicio DATE NOT NULL,
   fechaFin DATE NOT NULL,
   descripcion VARCHAR(255) NULL,
+  empresa VARCHAR(60) NULL,
   completada TINYINT(1) NOT NULL DEFAULT 0,
   createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt TIMESTAMP NULL,

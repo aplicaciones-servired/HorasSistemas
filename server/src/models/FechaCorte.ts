@@ -6,18 +6,20 @@ export interface FechaCorteAttributes {
   fechaInicio: string;
   fechaFin: string;
   descripcion: string | null;
+  empresa: string | null;
   completada: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export type FechaCorteCreationAttributes = Optional<FechaCorteAttributes, 'id' | 'descripcion' | 'completada'>;
+export type FechaCorteCreationAttributes = Optional<FechaCorteAttributes, 'id' | 'descripcion' | 'empresa' | 'completada'>;
 
 export class FechaCorte extends Model<FechaCorteAttributes, FechaCorteCreationAttributes> implements FechaCorteAttributes {
   declare id: number;
   declare fechaInicio: string;
   declare fechaFin: string;
   declare descripcion: string | null;
+  declare empresa: string | null;
   declare completada: boolean;
   declare createdAt: Date;
   declare updatedAt: Date;
@@ -40,6 +42,10 @@ FechaCorte.init(
     },
     descripcion: {
       type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    empresa: {
+      type: DataTypes.STRING(60),
       allowNull: true
     },
     completada: {

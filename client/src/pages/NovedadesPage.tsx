@@ -21,11 +21,6 @@ export const NovedadesPage = () => {
     return dashboard.personas.filter((p) => p.empresa === dashboard.empresaFilter);
   }, [dashboard.personas, dashboard.empresaFilter]);
 
-  const registrosFiltrados = useMemo(() => {
-    if (!dashboard.empresaFilter) return dashboard.registrosFechaCorte;
-    return dashboard.registrosFechaCorte.filter((r) => r.persona?.empresa === dashboard.empresaFilter);
-  }, [dashboard.registrosFechaCorte, dashboard.empresaFilter]);
-
   const drawerTitle = dashboard.editingRegistroId ? 'Editar novedad' : 'Registrar asistencia';
 
   const handleDescargarHorasExtras = async () => {
@@ -113,14 +108,14 @@ export const NovedadesPage = () => {
               type="button"
               className="primary-button"
               onClick={handleDescargarHorasExtras}
-              disabled={descargando || registrosFiltrados.length === 0}
+              disabled={descargando || dashboard.registrosFechaCorte.length === 0}
             >
               {descargando ? 'Descargando...' : 'Horas Extras'}
             </button>
           </div>
 
           <RegistrosTable
-            registros={registrosFiltrados}
+            registros={dashboard.registrosFechaCorte}
             onEdit={dashboard.loadRegistroForEdit}
             onDelete={dashboard.handleEliminarRegistro}
           />

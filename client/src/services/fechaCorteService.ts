@@ -5,6 +5,7 @@ export interface FechaCortePayload {
   fechaInicio: string;
   fechaFin: string;
   descripcion?: string;
+  empresa?: string | null;
 }
 
 export const fechaCorteService = {

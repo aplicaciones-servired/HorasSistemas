@@ -82,6 +82,7 @@ export interface FechaCorte {
   fechaInicio: string;
   fechaFin: string;
   descripcion: string | null;
+  empresa: string | null;
   completada: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -92,6 +93,7 @@ export interface FechaCorteFormValues {
   fechaInicio: string;
   fechaFin: string;
   descripcion: string;
+  empresa?: string | null;
 }
 
 export interface User {

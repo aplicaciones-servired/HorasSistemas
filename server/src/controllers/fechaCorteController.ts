@@ -6,26 +6,19 @@ import { sendExcelEmail } from '../services/emailService';
 const horasExtrasService = new HorasExtrasService();
 
 export const listFechasCorte = async (req: Request, res: Response): Promise<void> => {
-  const empresa = req.query.empresa as string | undefined;
+  const empresa = (req.query.empresa as string | undefined)?.trim();
+
+  const where: any = {};
+  if (empresa) where.empresa = empresa;
 
   const fechas = await FechaCorte.findAll({
+    where,
     include: [
       {
         model: RegistroAsistencia,
         as: 'registros',
         attributes: ['id'],
-        required: Boolean(empresa),
-        ...(empresa
-          ? {
-              include: [{
-                model: Persona,
-                as: 'persona',
-                attributes: ['id'],
-                required: true,
-                where: { empresa }
-              }]
-            }
-          : {})
+        required: false
       }
     ],
     order: [['createdAt', 'DESC']]
@@ -59,10 +52,11 @@ export const getFechaCorte = async (req: Request, res: Response): Promise<void> 
 };
 
 export const createFechaCorte = async (req: Request, res: Response): Promise<void> => {
-  const { fechaInicio, fechaFin, descripcion } = req.body as {
+  const { fechaInicio, fechaFin, descripcion, empresa } = req.body as {
     fechaInicio?: string;
     fechaFin?: string;
     descripcion?: string;
+    empresa?: string | null;
   };
 
   if (!fechaInicio || !fechaFin) {
@@ -78,7 +72,8 @@ export const createFechaCorte = async (req: Request, res: Response): Promise<voi
   const fecha = await FechaCorte.create({
     fechaInicio,
     fechaFin,
-    descripcion: descripcion ?? null
+    descripcion: descripcion ?? null,
+    empresa: empresa ?? null
   });
 
   res.status(201).json(fecha);
@@ -193,24 +188,19 @@ export const listRegistrosByFechaCorte = async (req: Request, res: Response): Pr
   }
 
   const where: any = { fechaCorteId: fecha.id };
-  const includeOptions: any[] = [
-    { model: Cargo, as: 'cargo' }
-  ];
 
   if (empresa) {
-    includeOptions.push({
-      model: Persona,
-      as: 'persona',
-      where: { empresa },
-      required: true
-    });
-  } else {
-    includeOptions.push({ model: Persona, as: 'persona' });
+    const personas = await Persona.findAll({ where: { empresa }, attributes: ['id'], raw: true });
+    const personaIds = personas.map((p) => p.id);
+    where.personaId = personaIds.length > 0 ? personaIds : [-1];
   }
 
   const registros = await RegistroAsistencia.findAll({
     where,
-    include: includeOptions,
+    include: [
+      { model: Persona, as: 'persona' },
+      { model: Cargo, as: 'cargo' }
+    ],
     order: [['fecha', 'ASC'], ['horaEntrada', 'ASC']]
   });
 

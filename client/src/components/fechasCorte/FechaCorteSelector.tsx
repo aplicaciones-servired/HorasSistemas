@@ -205,6 +205,9 @@ export const FechaCorteSelector = ({
                         <span className={`fc-card__badge${fc.completada ? ' fc-card__badge--done' : ''}`}>
                           {fc.completada ? 'Finalizada' : 'Activa'}
                         </span>
+                        {fc.empresa && (
+                          <span className="fc-card__empresa">{fc.empresa}</span>
+                        )}
                       </div>
                       <div className="fc-card__dates">
                         <span className="fc-card__date">{formatDate(fc.fechaInicio)}</span>

@@ -1135,6 +1135,16 @@ th {
   color: #15803d;
 }
 
+.fc-card__empresa {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(228, 63, 112, 0.925);
+  color: #000000;
+}
+
 .fc-card__dates {
   display: flex;
   align-items: center;

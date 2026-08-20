@@ -151,7 +151,7 @@ export const useDashboard = () => {
   const handleCreateFechaCorte = async (values: FechaCorteFormValues): Promise<void> => {
     setIsSavingFechaCorte(true);
     try {
-      await fechaCorteService.create(values);
+      await fechaCorteService.create({ ...values, empresa: empresaFilter || null });
       setStatus({ type: 'success', message: 'Fecha de corte creada correctamente.' });
       await refreshData();
     } catch (error) {
