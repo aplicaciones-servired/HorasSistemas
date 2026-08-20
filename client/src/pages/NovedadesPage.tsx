@@ -84,10 +84,13 @@ export const NovedadesPage = () => {
           selectedId={dashboard.selectedFechaCorteId}
           isLoading={dashboard.isLoading}
           isSaving={dashboard.isSavingFechaCorte}
+          empresaFilter={dashboard.empresaFilter}
+          canFilterEmpresa={canFilterEmpresa}
           onSelect={dashboard.setSelectedFechaCorteId}
           onCreate={dashboard.handleCreateFechaCorte}
           onDelete={dashboard.handleDeleteFechaCorte}
           onFinalizar={(id) => dashboard.handleFinalizarFechaCorte(id, dashboard.empresaFilter || undefined)}
+          onEmpresaFilterChange={dashboard.setEmpresaFilter}
         />
       </section>
 

@@ -6,10 +6,13 @@ interface FechaCorteSelectorProps {
   selectedId: number | null;
   isLoading: boolean;
   isSaving: boolean;
+  empresaFilter: string;
+  canFilterEmpresa: boolean;
   onSelect: (id: number | null) => void;
   onCreate: (values: FechaCorteFormValues) => void;
   onDelete: (id: number) => void;
   onFinalizar: (id: number) => void;
+  onEmpresaFilterChange: (empresa: string) => void;
 }
 
 const today = new Date().toISOString().slice(0, 10);
@@ -26,10 +29,13 @@ export const FechaCorteSelector = ({
   selectedId,
   isLoading,
   isSaving,
+  empresaFilter,
+  canFilterEmpresa,
   onSelect,
   onCreate,
   onDelete,
-  onFinalizar
+  onFinalizar,
+  onEmpresaFilterChange
 }: FechaCorteSelectorProps) => {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<FechaCorteFormValues>({
@@ -119,6 +125,19 @@ export const FechaCorteSelector = ({
                 placeholder="Ej: Corte quincenal agosto"
               />
             </label>
+            {canFilterEmpresa && (
+              <label className="fc-create-form__field">
+                Empresa
+                <select
+                  value={empresaFilter}
+                  onChange={(e) => onEmpresaFilterChange(e.target.value)}
+                >
+                  <option value="">Sin empresa</option>
+                  <option value="Servired">Servired</option>
+                  <option value="Multired">Multired</option>
+                </select>
+              </label>
+            )}
           </div>
           <button type="button" className="primary-button" onClick={handleCreate} disabled={isSaving}>
             {isSaving ? 'Creando...' : 'Crear fecha de corte'}
