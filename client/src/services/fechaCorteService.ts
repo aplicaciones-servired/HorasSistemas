@@ -9,14 +9,9 @@ export interface FechaCortePayload {
 
 export const fechaCorteService = {
   async list(empresa?: string): Promise<FechaCorte[]> {
-    const params: any = {};
+    const params: Record<string, string> = {};
     if (empresa) params.empresa = empresa;
     const response = await api.get<FechaCorte[]>('/fechas-corte', { params });
-    return response.data;
-  },
-
-  async get(id: number): Promise<FechaCorte> {
-    const response = await api.get<FechaCorte>(`/fechas-corte/${id}`);
     return response.data;
   },
 
@@ -25,17 +20,12 @@ export const fechaCorteService = {
     return response.data;
   },
 
-  async update(id: number, payload: Partial<FechaCortePayload>): Promise<FechaCorte> {
-    const response = await api.put<FechaCorte>(`/fechas-corte/${id}`, payload);
-    return response.data;
-  },
-
   async remove(id: number): Promise<void> {
     await api.delete(`/fechas-corte/${id}`);
   },
 
   async finalizar(id: number, empresa?: string): Promise<Blob> {
-    const params: any = {};
+    const params: Record<string, string> = {};
     if (empresa) params.empresa = empresa;
     const response = await api.post(`/fechas-corte/${id}/finalizar`, null, {
       responseType: 'blob',
@@ -45,7 +35,7 @@ export const fechaCorteService = {
   },
 
   async listRegistros(id: number, empresa?: string): Promise<RegistroAsistencia[]> {
-    const params: any = {};
+    const params: Record<string, string> = {};
     if (empresa) params.empresa = empresa;
     const response = await api.get<RegistroAsistencia[]>(`/fechas-corte/${id}/registros`, { params });
     return response.data;

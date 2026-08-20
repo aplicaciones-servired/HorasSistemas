@@ -77,8 +77,7 @@ export class NominaService {
         }
       });
 
-      const horasNetas = horasTotales;
-      const salarioTotal = horasNetas * valorHora;
+      const salarioTotal = horasTotales * valorHora;
 
       nomina.push({
         cedula: persona.cedula,
@@ -87,7 +86,7 @@ export class NominaService {
         cargo: cargo?.nombre || 'N/A',
         horasTrabajadas: Math.round(horasTotales * 100) / 100,
         horasDominicales: Math.round(horasDominicales * 100) / 100,
-        horasNetas: Math.round(horasNetas * 100) / 100,
+        horasNetas: Math.round(horasTotales * 100) / 100,
         valorHora,
         salarioTotal: Math.round(salarioTotal)
       });

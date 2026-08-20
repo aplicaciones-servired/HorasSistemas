@@ -1,16 +1,13 @@
 import ExcelJS from 'exceljs';
-import { RegistroAsistencia, Persona, Cargo } from '../models';
+import { RegistroAsistencia } from '../models';
 
 export class ReporteService {
   async generarExcelAsistencia(
-    registros: RegistroAsistencia[],
-    personas: Map<number, Persona>,
-    cargos: Map<number, Cargo>
+    registros: RegistroAsistencia[]
   ): Promise<any> {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Asistencia');
 
-    // Encabezados
     worksheet.columns = [
       { header: 'Fecha', key: 'fecha', width: 12 },
       { header: 'Cédula', key: 'cedula', width: 12 },
@@ -22,7 +19,6 @@ export class ReporteService {
       { header: 'Observación', key: 'observacion', width: 30 }
     ];
 
-    // Estilos para encabezado
     worksheet.getRow(1).fill = {
       type: 'pattern',
       pattern: 'solid',
@@ -37,36 +33,29 @@ export class ReporteService {
 
     worksheet.getRow(1).alignment = { horizontal: 'center', vertical: 'middle' };
 
-    // Agregar datos
     registros.forEach((registro: any) => {
-      const persona = personas.get(registro.personaId);
-      const cargo = cargos.get(registro.cargoId);
-
       worksheet.addRow({
         fecha: registro.fecha ? new Date(registro.fecha).toLocaleDateString('es-ES') : '',
-        cedula: persona?.cedula || '',
-        nombres: persona?.nombres || '',
-        apellidos: persona?.apellidos || '',
-        cargo: cargo?.nombre || '',
+        cedula: registro.persona?.cedula || '',
+        nombres: registro.persona?.nombres || '',
+        apellidos: registro.persona?.apellidos || '',
+        cargo: registro.cargo?.nombre || '',
         horaEntrada: registro.horaEntrada || '',
         horaSalida: registro.horaSalida || '',
         observacion: registro.observacion || ''
       });
     });
 
-    // Alinear columnas
     worksheet.columns.forEach(column => {
       column.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
     });
 
-    // Ajustar altura de filas
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber > 1) {
         row.height = 24;
       }
     });
 
-    // Generar buffer
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
   }

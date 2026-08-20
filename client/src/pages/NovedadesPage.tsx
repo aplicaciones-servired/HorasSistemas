@@ -33,7 +33,7 @@ export const NovedadesPage = () => {
         dashboard.setStatus({ type: 'success', message: 'Excel descargado correctamente.' });
       }
     } catch (error) {
-      console.error('Error descargando horas extras:', error);
+      dashboard.setStatus({ type: 'error', message: 'Error al descargar horas extras.' });
     } finally {
       setDescargando(false);
     }
@@ -104,7 +104,6 @@ export const NovedadesPage = () => {
             onSelectPersona={dashboard.handleSelectPersona}
             onReset={dashboard.resetRegistroForm}
             onSubmit={dashboard.handleGuardarRegistro}
-            onDeletePersona={dashboard.handleEliminarPersona}
           />
         </section>
       )}

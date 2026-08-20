@@ -1,7 +1,6 @@
 import type { FormEvent } from 'react';
 import type { Cargo, LookupState, Persona, RegistroFormValues, Turno } from '../../types/domain';
 import { CalendarMultiDate } from '../ui/CalendarMultiDate';
-import '../../index.css';
 
 interface RegistroFormProps {
   values: RegistroFormValues;
@@ -17,7 +16,6 @@ interface RegistroFormProps {
   onSelectPersona: (personaId: number | null) => void;
   onReset: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  onDeletePersona: (persona: Persona) => void;
 }
 
 export const RegistroForm = ({
@@ -33,8 +31,7 @@ export const RegistroForm = ({
   onBuscarCedula,
   onSelectPersona,
   onReset,
-  onSubmit,
-  // onDeletePersona
+  onSubmit
 }: RegistroFormProps) => {
   return (
     <section className="panel panel--main">
@@ -50,7 +47,7 @@ export const RegistroForm = ({
 
       <form className="stack-form-split" onSubmit={onSubmit}>
         <div className="stack-form-fields">
-          <div className="formgrid form-grid--three">
+          <div className="form-grid form-grid--three">
             <label>
               Usuario existente
               <select
@@ -194,27 +191,6 @@ export const RegistroForm = ({
               placeholder="Anotaciones adicionales o novedades"
             />
           </label>
-
-          {/* {personaEncontrada ? (
-            <div className="person-chip">
-              <div className="person-chip__header">
-                <div>
-                  <span>Persona cargada</span>
-                  <strong>
-                    {personaEncontrada.nombres} {personaEncontrada.apellidos}
-                  </strong>
-                  <small>Cédula {personaEncontrada.cedula}</small>
-                </div>
-                <button
-                  type="button"
-                  className="button-sm danger-button"
-                  onClick={() => onDeletePersona(personaEncontrada)}
-                >
-                  Eliminar usuario
-                </button>
-              </div>
-            </div>
-          ) : null} */}
 
           <div className="form-actions">
             <p className="helper-text">

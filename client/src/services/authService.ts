@@ -10,7 +10,6 @@ const authApi = axios.create({
 
 export const login = async (username: string, password: string): Promise<LoginResponse> => {
   const { data } = await authApi.post<LoginResponse>('/login', { username, password });
-  console.log('[AUTH] Login response:', data);
   return data;
 };
 

@@ -42,10 +42,10 @@ export const TurnosTable = ({ turnos, onEdit, onDelete }: TurnosTableProps) => {
                   <td>{turno.horaSalida}</td>
                   <td>{turno.esDominical ? 'Sí' : 'No'}</td>
                   <td>
-                    <button className="button-sm ghost-button" onClick={() => onEdit(turno)}>
+                    <button type="button" className="button-sm ghost-button" onClick={() => onEdit(turno)}>
                       Editar
                     </button>
-                    <button className="button-sm ghost-button" onClick={() => onDelete(turno)}>
+                    <button type="button" className="button-sm danger-button" onClick={() => onDelete(turno)}>
                       Eliminar
                     </button>
                   </td>

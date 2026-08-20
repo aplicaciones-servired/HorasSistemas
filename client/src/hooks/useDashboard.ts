@@ -185,14 +185,13 @@ export const useDashboard = () => {
     setIsSavingFechaCorte(true);
     try {
       const blob = await fechaCorteService.finalizar(id, empresa);
-      const url = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement('a');
-      link.href = url;
-      const fc = fechasCorte.find((f) => f.id === id);
       const empresaLabel = empresa ? `_${empresa}` : '';
       const filename = fc
         ? `Novedades_nomina_jamundi${empresaLabel}_${fc.fechaInicio}_${fc.fechaFin}.xlsx`
         : `Novedades_nomina_jamundi${empresaLabel}.xlsx`;
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
       link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
