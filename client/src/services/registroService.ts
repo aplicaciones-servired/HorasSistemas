@@ -13,7 +13,7 @@ export interface RegistroPayload {
 }
 
 export const listRegistros = async (fechaCorteId?: number, empresa?: string): Promise<RegistroAsistencia[]> => {
-  const params: any = {};
+  const params: Record<string, string | number> = {};
   if (fechaCorteId) params.fechaCorteId = fechaCorteId;
   if (empresa) params.empresa = empresa;
   const response = await api.get<RegistroAsistencia[]>('/registros', { params });

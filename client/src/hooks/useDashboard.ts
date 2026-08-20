@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { createCargo, listCargos } from '../services/cargoService';
 import { getApiErrorMessage } from '../services/api';
 import { fechaCorteService } from '../services/fechaCorteService';
@@ -100,7 +100,7 @@ export const useDashboard = () => {
     setStatus((current) => (current.type === 'success' ? current : { type: 'idle', message: '' }));
   };
 
-  const refreshData = async (empresa: string | undefined = empresaFilter || undefined): Promise<void> => {
+  const refreshData = useCallback(async (empresa: string | undefined = empresaFilter || undefined): Promise<void> => {
     const requestId = ++refreshRequestId.current;
     setIsLoading(true);
     try {
@@ -125,13 +125,14 @@ export const useDashboard = () => {
     } finally {
       if (requestId === refreshRequestId.current) setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    void refreshData(empresaFilter || undefined);
   }, [empresaFilter]);
 
-  const refreshRegistrosFechaCorte = async (): Promise<void> => {
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Standard React data-fetching pattern
+    void refreshData(empresaFilter || undefined);
+  }, [refreshData, empresaFilter]);
+
+  const refreshRegistrosFechaCorte = useCallback(async (): Promise<void> => {
     if (!selectedFechaCorteId) {
       setRegistrosFechaCorte([]);
       return;
@@ -142,11 +143,12 @@ export const useDashboard = () => {
     } catch (error) {
       setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudieron cargar los registros de la fecha de corte') });
     }
-  };
+  }, [selectedFechaCorteId, empresaFilter]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Standard React data-fetching pattern
     void refreshRegistrosFechaCorte();
-  }, [selectedFechaCorteId, empresaFilter]);
+  }, [refreshRegistrosFechaCorte]);
 
   const handleCreateFechaCorte = async (values: FechaCorteFormValues): Promise<void> => {
     setIsSavingFechaCorte(true);

@@ -37,6 +37,7 @@ export const TurnosPage = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Standard React data-fetching pattern
     void refresh();
   }, []);
 

@@ -11,7 +11,7 @@ export interface PersonaPayload {
 }
 
 export const listPersonas = async (empresa?: string): Promise<Persona[]> => {
-  const params: any = {};
+  const params: Record<string, string | number> = {};
   if (empresa) params.empresa = empresa;
   const response = await api.get<Persona[]>('/personas', { params });
   return response.data;

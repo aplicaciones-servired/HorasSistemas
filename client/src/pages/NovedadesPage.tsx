@@ -35,7 +35,7 @@ export const NovedadesPage = () => {
       } else {
         dashboard.setStatus({ type: 'success', message: 'Excel descargado correctamente.' });
       }
-    } catch (error) {
+    } catch {
       dashboard.setStatus({ type: 'error', message: 'Error al descargar horas extras.' });
     } finally {
       setDescargando(false);
