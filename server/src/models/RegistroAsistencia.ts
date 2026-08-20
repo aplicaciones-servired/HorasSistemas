@@ -14,11 +14,13 @@ export interface RegistroAsistenciaAttributes {
   horaSalida: string;
   observacion: string | null;
   esDominical: boolean;
+  horasExtraDiurnaOrd: number;
+  horasExtraNocturnaOrd: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export type RegistroAsistenciaCreationAttributes = Optional<RegistroAsistenciaAttributes, 'id' | 'cargoId' | 'fechaCorteId' | 'observacion' | 'esDominical'>;
+export type RegistroAsistenciaCreationAttributes = Optional<RegistroAsistenciaAttributes, 'id' | 'cargoId' | 'fechaCorteId' | 'observacion' | 'esDominical' | 'horasExtraDiurnaOrd' | 'horasExtraNocturnaOrd'>;
 
 export class RegistroAsistencia extends Model<RegistroAsistenciaAttributes, RegistroAsistenciaCreationAttributes> implements RegistroAsistenciaAttributes {
   declare id: number;
@@ -30,6 +32,8 @@ export class RegistroAsistencia extends Model<RegistroAsistenciaAttributes, Regi
   declare horaSalida: string;
   declare observacion: string | null;
   declare esDominical: boolean;
+  declare horasExtraDiurnaOrd: number;
+  declare horasExtraNocturnaOrd: number;
   declare createdAt: Date;
   declare updatedAt: Date;
 }
@@ -85,6 +89,16 @@ RegistroAsistencia.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    horasExtraDiurnaOrd: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: false,
+      defaultValue: 0
+    },
+    horasExtraNocturnaOrd: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: false,
+      defaultValue: 0
     }
   },
   {

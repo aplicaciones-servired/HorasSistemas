@@ -29,7 +29,7 @@ export const listRegistros = async (request: Request, response: Response): Promi
 };
 
 export const createRegistro = async (request: Request, response: Response): Promise<void> => {
-  const { personaId, cargoId, fechaCorteId, fecha, horaEntrada, horaSalida, observacion, esDominical } = request.body as {
+  const { personaId, cargoId, fechaCorteId, fecha, horaEntrada, horaSalida, observacion, esDominical, horasExtraDiurnaOrd, horasExtraNocturnaOrd } = request.body as {
     personaId?: number;
     cargoId?: number | null;
     fechaCorteId?: number | null;
@@ -38,6 +38,8 @@ export const createRegistro = async (request: Request, response: Response): Prom
     horaSalida?: string;
     observacion?: string;
     esDominical?: boolean;
+    horasExtraDiurnaOrd?: number;
+    horasExtraNocturnaOrd?: number;
   };
 
   if (!personaId || !fecha || !horaEntrada || !horaSalida) {
@@ -58,7 +60,9 @@ export const createRegistro = async (request: Request, response: Response): Prom
     horaEntrada,
     horaSalida,
     observacion: observacion ?? null,
-    esDominical: esDominical ?? false
+    esDominical: esDominical ?? false,
+    horasExtraDiurnaOrd: Number(horasExtraDiurnaOrd) || 0,
+    horasExtraNocturnaOrd: Number(horasExtraNocturnaOrd) || 0
   });
 
   response.status(201).json(registro);
@@ -73,7 +77,7 @@ export const updateRegistro = async (request: Request, response: Response): Prom
     return;
   }
 
-  const { personaId, cargoId, fechaCorteId, fecha, horaEntrada, horaSalida, observacion, esDominical } = request.body as {
+  const { personaId, cargoId, fechaCorteId, fecha, horaEntrada, horaSalida, observacion, esDominical, horasExtraDiurnaOrd, horasExtraNocturnaOrd } = request.body as {
     personaId?: number;
     cargoId?: number | null;
     fechaCorteId?: number | null;
@@ -82,6 +86,8 @@ export const updateRegistro = async (request: Request, response: Response): Prom
     horaSalida?: string;
     observacion?: string;
     esDominical?: boolean;
+    horasExtraDiurnaOrd?: number;
+    horasExtraNocturnaOrd?: number;
   };
 
   if (personaId !== undefined) registro.personaId = personaId;
@@ -92,6 +98,8 @@ export const updateRegistro = async (request: Request, response: Response): Prom
   if (horaSalida !== undefined) registro.horaSalida = horaSalida;
   if (observacion !== undefined) registro.observacion = observacion;
   if (esDominical !== undefined) registro.esDominical = esDominical;
+  if (horasExtraDiurnaOrd !== undefined) registro.horasExtraDiurnaOrd = Number(horasExtraDiurnaOrd) || 0;
+  if (horasExtraNocturnaOrd !== undefined) registro.horasExtraNocturnaOrd = Number(horasExtraNocturnaOrd) || 0;
 
   if (registro.horaSalida <= registro.horaEntrada) {
     response.status(400).json({ message: 'La hora de salida debe ser mayor que la hora de entrada' });

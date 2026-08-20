@@ -25,6 +25,8 @@ export interface RegistroAsistencia {
   horaSalida: string;
   observacion: string | null;
   esDominical: boolean;
+  horasExtraDiurnaOrd: number;
+  horasExtraNocturnaOrd: number;
   persona?: Persona | null;
   cargo?: Cargo | null;
   fechaCorte?: FechaCorte | null;
@@ -42,6 +44,8 @@ export interface RegistroFormValues {
   horaSalida: string;
   observacion: string;
   esDominical: boolean;
+  horasExtraDiurnaOrd: string;
+  horasExtraNocturnaOrd: string;
 }
 
 export interface CargoFormValues {

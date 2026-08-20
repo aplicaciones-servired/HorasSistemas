@@ -7,7 +7,9 @@ interface ColumnRow {
 
 const columnsToEnsure = [
   { table: 'personas', column: 'empresa', definition: 'VARCHAR(60) NULL' },
-  { table: 'fechas_corte', column: 'empresa', definition: 'VARCHAR(60) NULL' }
+  { table: 'fechas_corte', column: 'empresa', definition: 'VARCHAR(60) NULL' },
+  { table: 'registros_asistencia', column: 'horasExtraDiurnaOrd', definition: 'DECIMAL(5,2) NOT NULL DEFAULT 0' },
+  { table: 'registros_asistencia', column: 'horasExtraNocturnaOrd', definition: 'DECIMAL(5,2) NOT NULL DEFAULT 0' }
 ] as const;
 
 const migrate = async (): Promise<void> => {

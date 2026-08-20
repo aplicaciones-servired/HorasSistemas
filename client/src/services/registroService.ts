@@ -10,6 +10,8 @@ export interface RegistroPayload {
   horaSalida: string;
   observacion: string | null;
   esDominical: boolean;
+  horasExtraDiurnaOrd: number;
+  horasExtraNocturnaOrd: number;
 }
 
 export const listRegistros = async (fechaCorteId?: number, empresa?: string): Promise<RegistroAsistencia[]> => {

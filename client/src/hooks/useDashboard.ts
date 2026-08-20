@@ -41,7 +41,9 @@ const buildInitialRegistroForm = (): RegistroFormValues => ({
   horaEntrada: '',
   horaSalida: '',
   observacion: '',
-  esDominical: false
+  esDominical: false,
+  horasExtraDiurnaOrd: '',
+  horasExtraNocturnaOrd: ''
 });
 
 const initialCargoForm: CargoFormValues = {
@@ -366,7 +368,9 @@ export const useDashboard = () => {
       horaEntrada: registro.horaEntrada,
       horaSalida: registro.horaSalida,
       observacion: registro.observacion ?? '',
-      esDominical: registro.esDominical
+      esDominical: registro.esDominical,
+      horasExtraDiurnaOrd: String(registro.horasExtraDiurnaOrd ?? ''),
+      horasExtraNocturnaOrd: String(registro.horasExtraNocturnaOrd ?? '')
     });
     setStatus({ type: 'info', message: 'Registro cargado para edición.' });
     setDrawerOpen(true);
@@ -429,7 +433,9 @@ export const useDashboard = () => {
     horaEntrada: values.horaEntrada,
     horaSalida: values.horaSalida,
     observacion: values.observacion.trim() ? values.observacion.trim() : null,
-    esDominical: values.esDominical
+    esDominical: values.esDominical,
+    horasExtraDiurnaOrd: Number(values.horasExtraDiurnaOrd) || 0,
+    horasExtraNocturnaOrd: Number(values.horasExtraNocturnaOrd) || 0
   });
 
   const handleGuardarRegistro = async (event: FormEvent<HTMLFormElement>): Promise<void> => {

@@ -180,6 +180,33 @@ export const RegistroForm = ({
             <span>Es dominical o festivo</span>
           </label>
 
+          <div className="form-grid form-grid--two">
+            <label>
+              Horas extra diurnas ordinarias
+              <input
+                type="number"
+                min="0"
+                max="24"
+                step="0.5"
+                value={values.horasExtraDiurnaOrd}
+                onChange={(event) => onChange('horasExtraDiurnaOrd', event.target.value)}
+                placeholder="0"
+              />
+            </label>
+            <label>
+              Horas extra nocturnas ordinarias
+              <input
+                type="number"
+                min="0"
+                max="24"
+                step="0.5"
+                value={values.horasExtraNocturnaOrd}
+                onChange={(event) => onChange('horasExtraNocturnaOrd', event.target.value)}
+                placeholder="0"
+              />
+            </label>
+          </div>
+
           <label>
             Observación
             <textarea

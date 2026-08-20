@@ -254,6 +254,10 @@ export class HorasExtrasService {
           minutosDeTurno(registro.horaEntrada, registro.horaSalida),
         );
 
+        const horas = calcularHoras(minutos, Boolean(registro.esDominical));
+        horas.extraDiurna += (Number(registro.horasExtraDiurnaOrd) || 0) * 60;
+        horas.extraNocturna += (Number(registro.horasExtraNocturnaOrd) || 0) * 60;
+
         return {
           nombre: persona
             ? `${persona.nombres} ${persona.apellidos}`.trim()
@@ -265,7 +269,7 @@ export class HorasExtrasService {
           horaEntrada: formatoHora(registro.horaEntrada),
           horaSalida: formatoHora(registro.horaSalida),
           esDominical: Boolean(registro.esDominical),
-          horas: calcularHoras(minutos, Boolean(registro.esDominical)),
+          horas,
         };
       })
       .sort((a, b) => {
