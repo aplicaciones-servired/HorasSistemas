@@ -3,13 +3,17 @@ import { DashboardHeader } from '../components/layout/DashboardHeader';
 import { RegistrosTable } from '../components/tables/RegistrosTable';
 import { FechaCorteSelector } from '../components/fechasCorte/FechaCorteSelector';
 import { useDashboard } from '../hooks/useDashboard';
+import { useAuth } from '../components/auth/useAuth';
 import { StatusToaster } from '../components/toast/StatusToaster';
 import { reporteService } from '../services/reporteService';
 import { useState, useMemo } from 'react';
 
 export const NovedadesPage = () => {
   const dashboard = useDashboard();
+  const { userCompany } = useAuth();
   const [descargando, setDescargando] = useState(false);
+
+  const canFilterEmpresa = userCompany === 'MultiredYServired';
 
   const personasFiltradas = useMemo(() => {
     if (!dashboard.empresaFilter) return dashboard.personas;
@@ -45,29 +49,31 @@ export const NovedadesPage = () => {
 
       <StatusToaster status={dashboard.status} />
 
-      <section className="panel panel--main">
-        <div className="panel-header">
-          <div>
-            <span className="section-label">Filtro de empresa</span>
-            <h2>Seleccionar empresa</h2>
+      {canFilterEmpresa && (
+        <section className="panel panel--main">
+          <div className="panel-header">
+            <div>
+              <span className="section-label">Filtro de empresa</span>
+              <h2>Seleccionar empresa</h2>
+            </div>
           </div>
-        </div>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'end', flexWrap: 'wrap' }}>
-          <label style={{ flex: 1, minWidth: '200px' }}>
-            Empresa
-            <select value={dashboard.empresaFilter} onChange={(e) => dashboard.setEmpresaFilter(e.target.value)}>
-              <option value="">Todas las empresas</option>
-              <option value="Servired">Servired</option>
-              <option value="Multired">Multired</option>
-            </select>
-          </label>
-          {dashboard.empresaFilter && (
-            <span style={{ fontSize: '0.8rem', opacity: 0.6, alignSelf: 'end', marginBottom: '2px' }}>
-              {personasFiltradas.length} personas de {dashboard.empresaFilter}
-            </span>
-          )}
-        </div>
-      </section>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'end', flexWrap: 'wrap' }}>
+            <label style={{ flex: 1, minWidth: '200px' }}>
+              Empresa
+              <select value={dashboard.empresaFilter} onChange={(e) => dashboard.setEmpresaFilter(e.target.value)}>
+                <option value="">Todas las empresas</option>
+                <option value="Servired">Servired</option>
+                <option value="Multired">Multired</option>
+              </select>
+            </label>
+            {dashboard.empresaFilter && (
+              <span style={{ fontSize: '0.8rem', opacity: 0.6, alignSelf: 'end', marginBottom: '2px' }}>
+                {personasFiltradas.length} personas de {dashboard.empresaFilter}
+              </span>
+            )}
+          </div>
+        </section>
+      )}
 
       <section className="workspace-grid workspace-grid--single">
         <FechaCorteSelector

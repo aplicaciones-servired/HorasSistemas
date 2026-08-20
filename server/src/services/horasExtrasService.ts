@@ -685,7 +685,7 @@ export class HorasExtrasService {
     // Insertar logo de la empresa en el encabezado (A1:B3)
     const logoPath = path.resolve(
       __dirname,
-      "../../../client/src/assets/LOGO.png",
+      "../../assets/LOGO.png",
     );
     if (fs.existsSync(logoPath)) {
       const logoId = workbook.addImage({
@@ -704,7 +704,7 @@ export class HorasExtrasService {
     const firmaExt = isMultired ? "jpeg" : "png";
     const firmaPath = path.resolve(
       __dirname,
-      "../../../client/src/assets/" + firmaFileName,
+      "../../assets/" + firmaFileName,
     );
     if (fs.existsSync(firmaPath)) {
       const firmaId = workbook.addImage({

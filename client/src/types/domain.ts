@@ -93,3 +93,20 @@ export interface FechaCorteFormValues {
   fechaFin: string;
   descripcion: string;
 }
+
+export interface User {
+  id: string;
+  names: string;
+  lastnames: string;
+  document: number;
+  username: string;
+  email?: string;
+  rol?: string;
+  [key: string]: unknown;
+}
+
+export interface LoginResponse {
+  message: string;
+  company: string;
+  user: User;
+}

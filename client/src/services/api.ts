@@ -3,7 +3,8 @@ import { URL_DATA_HORAS } from '../util/const';
 
 export const api = axios.create({
   baseURL: URL_DATA_HORAS,
-  timeout: 15000
+  timeout: 15000,
+  withCredentials: true
 });
 
 export const getApiErrorMessage = (error: unknown, fallback: string): string => {

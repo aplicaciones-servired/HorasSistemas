@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
 import { Cargo, Persona } from '../models';
 
-export const listPersonas = async (_request: Request, response: Response): Promise<void> => {
+export const listPersonas = async (request: Request, response: Response): Promise<void> => {
+  const empresa = request.query.empresa as string | undefined;
+  const where: any = {};
+  if (empresa) where.empresa = empresa;
+
   const personas = await Persona.findAll({
+    where,
     include: [{ model: Cargo, as: 'cargo' }],
     order: [['nombres', 'ASC']]
   });

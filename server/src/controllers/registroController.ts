@@ -4,17 +4,30 @@ import { Cargo, Persona, RegistroAsistencia } from '../models';
 export const listRegistros = async (request: Request, response: Response): Promise<void> => {
   const where: any = {};
   const fechaCorteId = request.query.fechaCorteId;
+  const empresa = request.query.empresa as string | undefined;
 
   if (fechaCorteId) {
     where.fechaCorteId = Number(fechaCorteId);
   }
 
+  const includeOptions: any[] = [
+    { model: Cargo, as: 'cargo' }
+  ];
+
+  if (empresa) {
+    includeOptions.unshift({
+      model: Persona,
+      as: 'persona',
+      where: { empresa },
+      required: true
+    });
+  } else {
+    includeOptions.unshift({ model: Persona, as: 'persona' });
+  }
+
   const registros = await RegistroAsistencia.findAll({
     where,
-    include: [
-      { model: Persona, as: 'persona' },
-      { model: Cargo, as: 'cargo' }
-    ],
+    include: includeOptions,
     order: [['fecha', 'DESC'], ['horaEntrada', 'DESC']]
   });
 

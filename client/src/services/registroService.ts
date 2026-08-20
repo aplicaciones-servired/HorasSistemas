@@ -12,9 +12,10 @@ export interface RegistroPayload {
   esDominical: boolean;
 }
 
-export const listRegistros = async (fechaCorteId?: number): Promise<RegistroAsistencia[]> => {
+export const listRegistros = async (fechaCorteId?: number, empresa?: string): Promise<RegistroAsistencia[]> => {
   const params: any = {};
   if (fechaCorteId) params.fechaCorteId = fechaCorteId;
+  if (empresa) params.empresa = empresa;
   const response = await api.get<RegistroAsistencia[]>('/registros', { params });
   return response.data;
 };

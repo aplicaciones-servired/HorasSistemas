@@ -10,8 +10,10 @@ export interface PersonaPayload {
   activo?: boolean;
 }
 
-export const listPersonas = async (): Promise<Persona[]> => {
-  const response = await api.get<Persona[]>('/personas');
+export const listPersonas = async (empresa?: string): Promise<Persona[]> => {
+  const params: any = {};
+  if (empresa) params.empresa = empresa;
+  const response = await api.get<Persona[]>('/personas', { params });
   return response.data;
 };
 

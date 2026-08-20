@@ -5,15 +5,18 @@ import './index.css'
 import App from './App.tsx'
 import { ToastProvider } from './components/toast/ToastProvider'
 import { ConfirmProvider } from './components/toast/ConfirmProvider'
+import { AuthProvider } from './components/auth/AuthProvider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <ToastProvider>
-        <ConfirmProvider>
-          <App />
-        </ConfirmProvider>
-      </ToastProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <ConfirmProvider>
+            <App />
+          </ConfirmProvider>
+        </ToastProvider>
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 )

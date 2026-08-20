@@ -969,3 +969,378 @@ th {
   justify-content: space-between;
   gap: 12px;
 }
+
+/* ── Login ───────────────────────────────────────── */
+
+.login-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 36px 32px;
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(12px);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-header .eyebrow {
+  color: #1d4ed8;
+}
+
+.login-header h1 {
+  margin: 10px 0 6px;
+  font-size: 1.7rem;
+  letter-spacing: -0.04em;
+  color: var(--text-h);
+}
+
+.login-header p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.login-form {
+  gap: 18px;
+}
+
+.login-button {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* ── Topbar right ────────────────────────────────── */
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-session {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.user-session__info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.user-session__name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.user-session__company {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #1d4ed8;
+  letter-spacing: 0.02em;
+}
+
+.user-session .ghost-button {
+  padding: 0.5rem 0.9rem;
+  font-size: 0.82rem;
+}
+
+/* ── Fecha de corte cards ────────────────────────── */
+
+.fc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.fc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1.5px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--text-h);
+  transition: all 0.2s ease;
+}
+
+.fc-card:hover {
+  border-color: rgba(29, 78, 216, 0.25);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.07);
+  transform: translateY(-1px);
+}
+
+.fc-card--active {
+  border-color: #1d4ed8;
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.06), rgba(59, 130, 246, 0.08));
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12), 0 8px 24px rgba(29, 78, 216, 0.1);
+}
+
+.fc-card--active:hover {
+  border-color: #1d4ed8;
+}
+
+.fc-card--done {
+  opacity: 0.75;
+}
+
+.fc-card--done:hover {
+  opacity: 1;
+}
+
+.fc-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fc-card__badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(29, 78, 216, 0.1);
+  color: #1d4ed8;
+}
+
+.fc-card__badge--done {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+
+.fc-card__dates {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fc-card__date {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.fc-card__arrow {
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.fc-card__desc {
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.fc-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 760px) {
+  .fc-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fc-toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.fc-toolbar__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  padding-bottom: 2px;
+  white-space: nowrap;
+}
+
+.fc-toolbar__dates {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.fc-toolbar__field {
+  display: grid;
+  gap: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fc-toolbar__field input {
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--text-h);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fc-toolbar__field input:focus {
+  border-color: rgba(29, 78, 216, 0.45);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.fc-toolbar__sep {
+  color: var(--text);
+  padding-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+/* ── Formulario crear fecha de corte ─────────────── */
+
+.fc-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 16px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fc-create-form__row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.fc-create-form__field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.fc-create-form__field input {
+  padding: 0.7rem 0.9rem;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--text-h);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fc-create-form__field input:focus {
+  border-color: rgba(29, 78, 216, 0.45);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.fc-create-form__field--grow {
+  flex: 1;
+  min-width: 180px;
+}
+
+.fc-create-form__field--grow input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 760px) {
+  .fc-create-form__row {
+    flex-direction: column;
+  }
+
+  .fc-create-form__field--grow {
+    min-width: 0;
+  }
+}
+
+.fc-selected-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(29, 78, 216, 0.05);
+  border: 1px dashed rgba(29, 78, 216, 0.2);
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.fc-selected-banner > span {
+  white-space: nowrap;
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.fc-card--compact {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  flex: 1;
+}
+
+.fc-card--compact .fc-card__dates {
+  flex: 1;
+}
+
+.fc-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.fc-pager__info {
+  font-size: 0.8rem;
+  color: var(--text);
+  white-space: nowrap;
+}

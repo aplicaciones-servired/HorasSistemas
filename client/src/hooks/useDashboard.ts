@@ -13,6 +13,7 @@ import {
 import { createRegistro, deleteRegistro, listRegistros, updateRegistro, type RegistroPayload } from '../services/registroService';
 import { listTurnos } from '../services/turnoService';
 import { useConfirm } from '../components/toast/useConfirm';
+import { useAuth } from '../components/auth/useAuth';
 import type {
   Cargo,
   CargoFormValues,
@@ -59,6 +60,7 @@ const initialPersonaForm: PersonaFormValues = {
 
 export const useDashboard = () => {
   const { confirm } = useConfirm();
+  const { userCompany } = useAuth();
   const [cargos, setCargos] = useState<Cargo[]>([]);
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [registros, setRegistros] = useState<RegistroAsistencia[]>([]);
@@ -82,7 +84,10 @@ export const useDashboard = () => {
   const [selectedFechaCorteId, setSelectedFechaCorteId] = useState<number | null>(null);
   const [registrosFechaCorte, setRegistrosFechaCorte] = useState<RegistroAsistencia[]>([]);
   const [isSavingFechaCorte, setIsSavingFechaCorte] = useState(false);
-  const [empresaFilter, setEmpresaFilter] = useState<string>('');
+  const [empresaFilter, setEmpresaFilter] = useState<string>(() => {
+    if (userCompany === 'Servired' || userCompany === 'Multired') return userCompany;
+    return '';
+  });
 
   const selectedFechaCorte = fechasCorte.find((f) => f.id === selectedFechaCorteId) ?? null;
 
@@ -90,13 +95,14 @@ export const useDashboard = () => {
     setStatus((current) => (current.type === 'success' ? current : { type: 'idle', message: '' }));
   };
 
-  const refreshData = async (empresa?: string): Promise<void> => {
+  const refreshData = async (): Promise<void> => {
     setIsLoading(true);
     try {
+      const empresa = empresaFilter || undefined;
       const [nextCargos, nextPersonas, nextRegistros, nextTurnos, nextFechasCorte] = await Promise.all([
         listCargos(),
-        listPersonas(),
-        listRegistros(),
+        listPersonas(empresa),
+        listRegistros(undefined, empresa),
         listTurnos(),
         fechaCorteService.list(empresa)
       ]);
@@ -115,7 +121,7 @@ export const useDashboard = () => {
   };
 
   useEffect(() => {
-    void refreshData(empresaFilter || undefined);
+    void refreshData();
   }, [empresaFilter]);
 
   const refreshRegistrosFechaCorte = async (): Promise<void> => {
