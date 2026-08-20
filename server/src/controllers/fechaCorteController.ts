@@ -73,7 +73,7 @@ export const createFechaCorte = async (req: Request, res: Response): Promise<voi
     fechaInicio,
     fechaFin,
     descripcion: descripcion ?? null,
-    empresa: empresa ?? null
+    empresa: empresa || null
   });
 
   res.status(201).json(fecha);
