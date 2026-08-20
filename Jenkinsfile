@@ -78,7 +78,7 @@ pipeline {
     stage('delete images server') {
       steps {
         script {
-          def images = 'horas-server'
+          def images = 'horas-server-1'
           if (sh(script: "docker images -q ${images}", returnStdout: true).trim()) {
             sh "docker rmi ${images}"
           } else {
@@ -93,7 +93,7 @@ pipeline {
         script {
           // ❌ Ya no usamos --env-file porque no existe un .env global
           // ✅ docker-compose cargará automáticamente server/.env y client/.env
-          sh 'docker compose up -d'
+          sh 'docker compose up -d --build'
         }
       }
     }
