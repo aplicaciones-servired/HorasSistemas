@@ -37,6 +37,14 @@ pipeline {
       }
     }
 
+    stage('sync database schema') {
+      steps {
+        script {
+          sh 'cd ./server && npm run db:sync'
+        }
+      }
+    }
+
     stage('install dependencies client') {
       steps {
         script {
