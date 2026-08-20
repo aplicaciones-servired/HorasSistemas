@@ -79,6 +79,10 @@ export const FechaCorteSelector = ({
     setPage(0);
   };
 
+  console.log('emp', empresaFilter)
+  console.log('emp', onEmpresaFilterChange)
+  console.log('first',   canFilterEmpresa)
+
   return (
     <section className="panel panel--main">
       <div className="panel-header">
