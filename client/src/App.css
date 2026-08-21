@@ -1283,6 +1283,13 @@ th {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
+.fc-form-error {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
 .fc-create-form__field--grow {
   flex: 1;
   min-width: 180px;

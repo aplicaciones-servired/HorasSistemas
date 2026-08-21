@@ -165,6 +165,19 @@ export const useDashboard = () => {
     }
   };
 
+  const handleUpdateFechaCorte = async (id: number, values: FechaCorteFormValues): Promise<void> => {
+    setIsSavingFechaCorte(true);
+    try {
+      await fechaCorteService.update(id, values);
+      setStatus({ type: 'success', message: 'Fecha de corte actualizada correctamente.' });
+      await refreshData();
+    } catch (error) {
+      setStatus({ type: 'error', message: getApiErrorMessage(error, 'No se pudo actualizar la fecha de corte') });
+    } finally {
+      setIsSavingFechaCorte(false);
+    }
+  };
+
   const handleDeleteFechaCorte = async (id: number): Promise<void> => {
     const confirmado = await confirm('¿Eliminar esta fecha de corte?');
     if (!confirmado) return;
@@ -523,7 +536,9 @@ export const useDashboard = () => {
           horaEntrada: '',
           horaSalida: '',
           observacion: '',
-          esDominical: false
+          esDominical: false,
+          horasExtraDiurnaOrd: '',
+          horasExtraNocturnaOrd: ''
         }));
         setFoundPersona(null);
         setLookupState('idle');
@@ -692,6 +707,7 @@ export const useDashboard = () => {
     refreshData,
     setSelectedFechaCorteId,
     handleCreateFechaCorte,
+    handleUpdateFechaCorte,
     handleDeleteFechaCorte,
     handleFinalizarFechaCorte,
     handleGuardarRegistroGrid

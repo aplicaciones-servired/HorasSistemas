@@ -10,6 +10,7 @@ interface FechaCorteSelectorProps {
   canFilterEmpresa: boolean;
   onSelect: (id: number | null) => void;
   onCreate: (values: FechaCorteFormValues) => void;
+  onUpdate: (id: number, values: FechaCorteFormValues) => void;
   onDelete: (id: number) => void;
   onFinalizar: (id: number) => void;
   onEmpresaFilterChange: (empresa: string) => void;
@@ -33,11 +34,13 @@ export const FechaCorteSelector = ({
   canFilterEmpresa,
   onSelect,
   onCreate,
+  onUpdate,
   onDelete,
   onFinalizar,
   onEmpresaFilterChange
 }: FechaCorteSelectorProps) => {
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<FechaCorteFormValues>({
     fechaInicio: getToday(),
     fechaFin: getToday(),
@@ -66,11 +69,49 @@ export const FechaCorteSelector = ({
 
   const selectedOnDifferentPage = selected && !paginated.some((fc) => fc.id === selectedId);
 
-  const handleCreate = () => {
-    if (!form.fechaInicio || !form.fechaFin) return;
-    onCreate(form);
-    setForm({ fechaInicio: getToday(), fechaFin: getToday(), descripcion: '' });
+  const defaultForm = (): FechaCorteFormValues => ({
+    fechaInicio: getToday(),
+    fechaFin: getToday(),
+    descripcion: ''
+  });
+
+  const handleToggleCreate = () => {
+    if (showForm && !editingId) {
+      setShowForm(false);
+      return;
+    }
+    setEditingId(null);
+    setForm(defaultForm());
+    setShowForm(true);
+  };
+
+  const handleStartEdit = () => {
+    if (!selected) return;
+    setEditingId(selected.id);
+    setForm({
+      fechaInicio: selected.fechaInicio,
+      fechaFin: selected.fechaFin,
+      descripcion: selected.descripcion ?? ''
+    });
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
     setShowForm(false);
+    setEditingId(null);
+    setForm(defaultForm());
+  };
+
+  const fechasInvalidas = !!form.fechaInicio && !!form.fechaFin && form.fechaFin < form.fechaInicio;
+
+  const handleSubmit = () => {
+    if (!form.fechaInicio || !form.fechaFin || fechasInvalidas) return;
+    if (editingId) {
+      onUpdate(editingId, form);
+    } else {
+      onCreate(form);
+    }
+    handleCloseForm();
   };
 
   const handleClearFilter = () => {
@@ -90,7 +131,7 @@ export const FechaCorteSelector = ({
           <button
             type="button"
             className="ghost-button"
-            onClick={() => setShowForm(!showForm)}
+            onClick={handleToggleCreate}
             disabled={isSaving}
           >
             {showForm ? 'Cancelar' : '+ Nueva fecha de corte'}
@@ -125,7 +166,7 @@ export const FechaCorteSelector = ({
                 placeholder="Ej: Corte quincenal agosto"
               />
             </label>
-            {canFilterEmpresa && (
+            {canFilterEmpresa && !editingId && (
               <label className="fc-create-form__field">
                 Empresa
                 <select
@@ -139,8 +180,20 @@ export const FechaCorteSelector = ({
               </label>
             )}
           </div>
-          <button type="button" className="primary-button" onClick={handleCreate} disabled={isSaving}>
-            {isSaving ? 'Creando...' : 'Crear fecha de corte'}
+          {fechasInvalidas && (
+            <p className="fc-form-error">La fecha fin no puede ser menor que la fecha inicio.</p>
+          )}
+          <button
+            type="button"
+            className="primary-button"
+            onClick={handleSubmit}
+            disabled={isSaving || fechasInvalidas}
+          >
+            {isSaving
+              ? 'Guardando...'
+              : editingId
+                ? 'Guardar cambios'
+                : 'Crear fecha de corte'}
           </button>
         </div>
       )}
@@ -271,6 +324,16 @@ export const FechaCorteSelector = ({
 
       {selected && (
         <div className="fc-actions">
+          {!selected.completada && (
+            <button
+              type="button"
+              className="ghost-button"
+              onClick={handleStartEdit}
+              disabled={isSaving}
+            >
+              Editar fechas
+            </button>
+          )}
           <button
             type="button"
             className="danger-button"

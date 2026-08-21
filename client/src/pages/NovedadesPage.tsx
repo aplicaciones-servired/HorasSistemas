@@ -88,6 +88,7 @@ export const NovedadesPage = () => {
           canFilterEmpresa={canFilterEmpresa}
           onSelect={dashboard.setSelectedFechaCorteId}
           onCreate={dashboard.handleCreateFechaCorte}
+          onUpdate={dashboard.handleUpdateFechaCorte}
           onDelete={dashboard.handleDeleteFechaCorte}
           onFinalizar={(id) => dashboard.handleFinalizarFechaCorte(id, dashboard.empresaFilter || undefined)}
           onEmpresaFilterChange={dashboard.setEmpresaFilter}

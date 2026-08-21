@@ -99,6 +99,14 @@ export const updateFechaCorte = async (req: Request, res: Response): Promise<voi
     descripcion?: string;
   };
 
+  const nuevaInicio = fechaInicio ?? fecha.fechaInicio;
+  const nuevaFin = fechaFin ?? fecha.fechaFin;
+
+  if (nuevaFin < nuevaInicio) {
+    res.status(400).json({ message: 'La fecha fin no puede ser menor que la fecha inicio' });
+    return;
+  }
+
   if (fechaInicio !== undefined) fecha.fechaInicio = fechaInicio;
   if (fechaFin !== undefined) fecha.fechaFin = fechaFin;
   if (descripcion !== undefined) fecha.descripcion = descripcion;

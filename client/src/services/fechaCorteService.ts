@@ -21,6 +21,11 @@ export const fechaCorteService = {
     return response.data;
   },
 
+  async update(id: number, payload: FechaCortePayload): Promise<FechaCorte> {
+    const response = await api.put<FechaCorte>(`/fechas-corte/${id}`, payload);
+    return response.data;
+  },
+
   async remove(id: number): Promise<void> {
     await api.delete(`/fechas-corte/${id}`);
   },
