@@ -789,4 +789,92 @@ export class HorasExtrasService {
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
   }
+
+  generarDatosPreview(registros: RegistroAsistencia[], empresa?: string) {
+    let registrosFiltrados = registros;
+    if (empresa) {
+      registrosFiltrados = registros.filter((r: any) => {
+        const persona: Persona | undefined = r.persona;
+        return persona?.empresa === empresa;
+      });
+    }
+
+    const filas: FilaReporte[] = registrosFiltrados
+      .map((registro: any) => {
+        const persona: Persona | undefined = registro.persona;
+        const cargo: Cargo | undefined = registro.cargo;
+
+        const minutos = descontarAlmuerzo(
+          minutosDeTurno(registro.horaEntrada, registro.horaSalida),
+        );
+
+        const horas = calcularHoras(minutos, Boolean(registro.esDominical));
+        horas.extraDiurna += (Number(registro.horasExtraDiurnaOrd) || 0) * 60;
+        horas.extraNocturna += (Number(registro.horasExtraNocturnaOrd) || 0) * 60;
+
+        return {
+          nombre: persona
+            ? `${persona.nombres} ${persona.apellidos}`.trim()
+            : "",
+          cedula: persona?.cedula || "",
+          cargo: cargo?.nombre || "",
+          empresa: persona?.empresa || "",
+          fecha: registro.fecha,
+          horaEntrada: formatoHora(registro.horaEntrada),
+          horaSalida: formatoHora(registro.horaSalida),
+          esDominical: Boolean(registro.esDominical),
+          horas,
+        };
+      })
+      .sort((a, b) => {
+        if (a.esDominical !== b.esDominical) return a.esDominical ? -1 : 1;
+        const porNombre = a.nombre.localeCompare(b.nombre);
+        if (porNombre !== 0) return porNombre;
+        const porFecha = a.fecha.localeCompare(b.fecha);
+        if (porFecha !== 0) return porFecha;
+        return a.horaEntrada.localeCompare(b.horaEntrada);
+      });
+
+    const fechas = filas.map((f) => new Date(`${f.fecha}T12:00:00`));
+    let periodo = "";
+    if (fechas.length > 0) {
+      const minTs = fechas.reduce((min, d) => Math.min(min, d.getTime()), Infinity);
+      const maxTs = fechas.reduce((max, d) => Math.max(max, d.getTime()), -Infinity);
+      const fmt = (d: Date) => formatearPeriodo(d, d.getTime() === maxTs);
+      periodo = `${fmt(new Date(minTs))} al ${fmt(new Date(maxTs))}`;
+    }
+
+    const rows = filas.map((fila, idx) => ({
+      no: idx + 1,
+      nombre: fila.nombre,
+      cedula: fila.cedula,
+      cargo: fila.cargo,
+      fecha: fila.fecha,
+      horaEntrada: fila.horaEntrada,
+      horaSalida: fila.horaSalida,
+      recargoNocturnoOrdinario: celdaHoras(fila.horas.recargoNocturnoOrdinario),
+      recargoNocturnoFestivo: celdaHoras(fila.horas.recargoNocturnoFestivo),
+      extraDiurna: celdaHoras(fila.horas.extraDiurna),
+      extraNocturna: celdaHoras(fila.horas.extraNocturna),
+      dominicalDiurna: celdaHoras(fila.horas.dominicalDiurna),
+      dominicalNocturna: celdaHoras(fila.horas.dominicalNocturna),
+      extraDominicalDiurna: celdaHoras(fila.horas.extraDominicalDiurna),
+      extraDominicalNocturna: celdaHoras(fila.horas.extraDominicalNocturna),
+    }));
+
+    const isMultired = empresa === "Multired";
+    const compania = empresa === "Servired"
+      ? "Grupo Empresarial Servired S.A."
+      : empresa === "Multired"
+        ? "Grupo Empresarial Multired S.A."
+        : "Grupo Empresarial Servired S.A. / Grupo Empresarial Multired S.A.";
+
+    return {
+      periodo,
+      empresa: empresa || null,
+      compania,
+      elaboradoPor: isMultired ? "Diego Giraldo Garcia" : "Antony Hubeimar Chavez Lopez",
+      rows,
+    };
+  }
 }

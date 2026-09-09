@@ -7,12 +7,17 @@ import { useDashboard } from '../hooks/useDashboard';
 import { useAuth } from '../components/auth/useAuth';
 import { StatusToaster } from '../components/toast/StatusToaster';
 import { reporteService } from '../services/reporteService';
+import type { PreviewData } from '../services/reporteService';
+import { PreviewModal } from '../components/ui/PreviewModal';
 import { useState, useMemo } from 'react';
 
 export const NovedadesPage = () => {
   const dashboard = useDashboard();
   const { userCompany } = useAuth();
-  const [descargando, setDescargando] = useState(false);
+  // const [descargando, setDescargando] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState<PreviewData | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const canFilterEmpresa = userCompany === 'MultiredYServired';
 
@@ -23,22 +28,36 @@ export const NovedadesPage = () => {
 
   const drawerTitle = dashboard.editingRegistroId ? 'Editar novedad' : 'Registrar asistencia';
 
-  const handleDescargarHorasExtras = async () => {
+  // const handleDescargarHorasExtras = async () => {
+  //   try {
+  //     setDescargando(true);
+  //     await reporteService.descargarHorasExtras(
+  //       dashboard.selectedFechaCorteId ?? undefined,
+  //       dashboard.empresaFilter || undefined,
+  //       true
+  //     );
+  //     dashboard.setStatus({ type: 'success', message: 'Excel descargado correctamente.' });
+  //   } catch {
+  //     dashboard.setStatus({ type: 'error', message: 'Error al descargar horas extras.' });
+  //   } finally {
+  //     setDescargando(false);
+  //   }
+  // };
+
+  const handleVistaPrevia = async () => {
     try {
-      setDescargando(true);
-      await reporteService.descargarHorasExtras(
+      setPreviewOpen(true);
+      setPreviewLoading(true);
+      const data = await reporteService.obtenerVistaPrevia(
         dashboard.selectedFechaCorteId ?? undefined,
         dashboard.empresaFilter || undefined
       );
-      if (dashboard.empresaFilter) {
-        dashboard.setStatus({ type: 'success', message: `Excel descargado y correo enviado a destinatarios de ${dashboard.empresaFilter}.` });
-      } else {
-        dashboard.setStatus({ type: 'success', message: 'Excel descargado correctamente.' });
-      }
+      setPreviewData(data);
     } catch {
-      dashboard.setStatus({ type: 'error', message: 'Error al descargar horas extras.' });
+      dashboard.setStatus({ type: 'error', message: 'Error al cargar la vista previa.' });
+      setPreviewOpen(false);
     } finally {
-      setDescargando(false);
+      setPreviewLoading(false);
     }
   };
 
@@ -108,13 +127,21 @@ export const NovedadesPage = () => {
             >
               + Nuevo registro
             </button>
-            <button
+            {/* <button
               type="button"
               className="primary-button"
               onClick={handleDescargarHorasExtras}
               disabled={descargando || dashboard.registrosFechaCorte.length === 0}
             >
               {descargando ? 'Descargando...' : 'Horas Extras'}
+            </button> */}
+            <button
+              type="button"
+              className="primary-button"
+              onClick={handleVistaPrevia}
+              disabled={previewLoading || dashboard.registrosFechaCorte.length === 0}
+            >
+              {previewLoading ? 'Cargando...' : 'Vista Previa'}
             </button>
           </div>
 
@@ -143,6 +170,13 @@ export const NovedadesPage = () => {
           onSubmit={dashboard.handleGuardarRegistro}
         />
       </Drawer>
+
+      <PreviewModal
+        open={previewOpen}
+        data={previewData}
+        loading={previewLoading}
+        onClose={() => { setPreviewOpen(false); setPreviewData(null); }}
+      />
 
       {dashboard.isLoading ? <div className="loading-banner">Cargando datos iniciales...</div> : null}
     </>

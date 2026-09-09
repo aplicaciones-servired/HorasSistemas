@@ -61,6 +61,36 @@ export class HorasExtrasController {
     }
   }
 
+  async vistaPrevia(req: Request, res: Response) {
+    try {
+      const where: any = {};
+      const fechaCorteId = req.query.fechaCorteId;
+      const empresa = req.query.empresa as string | undefined;
+
+      if (fechaCorteId) {
+        where.fechaCorteId = Number(fechaCorteId);
+      }
+
+      const registros = await RegistroAsistencia.findAll({
+        where,
+        include: [
+          { model: Persona, as: 'persona' },
+          { model: Cargo, as: 'cargo' }
+        ]
+      });
+
+      if (registros.length === 0) {
+        return res.status(404).json({ error: 'No hay registros de asistencia' });
+      }
+
+      const datos = horasExtrasService.generarDatosPreview(registros, empresa);
+      res.json(datos);
+    } catch (error) {
+      console.error('Error generando vista previa:', error);
+      res.status(500).json({ error: 'Error al generar la vista previa' });
+    }
+  }
+
   async enviarHorasExtrasEmail(req: Request, res: Response) {
     try {
       const { fechaCorteId, empresa } = req.body as {

@@ -6,6 +6,7 @@ const router = Router();
 const horasExtrasController = new HorasExtrasController();
 
 router.get('/descargar', asyncHandler((req, res) => horasExtrasController.descargarHorasExtras(req, res)));
+router.get('/vista-previa', asyncHandler((req, res) => horasExtrasController.vistaPrevia(req, res)));
 router.post('/enviar-email', asyncHandler((req, res) => horasExtrasController.enviarHorasExtrasEmail(req, res)));
 
 export default router;
