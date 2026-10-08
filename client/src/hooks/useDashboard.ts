@@ -37,7 +37,7 @@ const buildInitialRegistroForm = (): RegistroFormValues => ({
   empresa: '',
   cargoId: '',
   fecha: getToday(),
-  fechas: [getToday()],
+  fechas: [],
   horaEntrada: '',
   horaSalida: '',
   observacion: '',
