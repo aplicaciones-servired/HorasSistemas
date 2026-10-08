@@ -123,16 +123,12 @@ export const CalendarMultiDate = ({ selected, onChange }: CalendarMultiDateProps
           const day = i + 1;
           const iso = toISODate(new Date(viewYear, viewMonth, day));
           const isSelected = selectedSet.has(iso);
-          const isToday =
-            day === today.getDate() &&
-            viewMonth === today.getMonth() &&
-            viewYear === today.getFullYear();
 
           return (
             <button
               key={day}
               type="button"
-              className={`cal-day ${isSelected ? 'cal-day--selected' : ''} ${isToday ? 'cal-day--today' : ''}`}
+              className={`cal-day ${isSelected ? 'cal-day--selected' : ''}`}
               onClick={() => toggleDate(day)}
             >
               {day}

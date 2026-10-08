@@ -725,7 +725,7 @@ export class HorasExtrasService {
       ? "Diego Giraldo Garcia"
       : "Antony Hubeimar Chavez Lopez";
     worksheet.getCell(`D${filaElab + 1}`).value =
-      "Coordinador de Telecomunicaciones";
+      "coordinador de soporte y mantenimiento";
     worksheet.getCell(`D${filaElab + 1}`).alignment = {
       horizontal: "center",
       vertical: "middle",
@@ -873,7 +873,7 @@ export class HorasExtrasService {
       periodo,
       empresa: empresa || null,
       compania,
-      elaboradoPor: isMultired ? "Diego Giraldo Garcia" : "Antony Hubeimar Chavez Lopez",
+      elaboradoPor: isMultired ? "Diego Giraldo Garcia" : "Camilo Andres Calvache",
       rows,
     };
   }

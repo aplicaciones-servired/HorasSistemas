@@ -30,7 +30,7 @@ const RECIPIENTS: Record<string, string[]> = {
 };
 
 const SIGNATURES: Record<string, string> = {
-  Servired: 'Antony Hubeimar Chavez Lopez',
+  Servired: 'camilo andres calvache',
   Multired: 'Diego Giraldo Garcia'
 };
 
