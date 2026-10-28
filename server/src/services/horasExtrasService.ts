@@ -723,7 +723,7 @@ export class HorasExtrasService {
 
     worksheet.getCell(`D${filaElab}`).value = isMultired
       ? "Diego Giraldo Garcia"
-      : "Antony Hubeimar Chavez Lopez";
+      : "camilo andres calvache";
     worksheet.getCell(`D${filaElab + 1}`).value =
       "coordinador de soporte y mantenimiento";
     worksheet.getCell(`D${filaElab + 1}`).alignment = {
